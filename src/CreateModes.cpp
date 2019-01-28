@@ -19,12 +19,15 @@ int searchUpperNearest(const Vector& p,double v)
 {
 	for(uint i =0;i<p.size();++i)
 	{
-		if(v<p[i])
+		if(v<=p[i])
 			return i;
 	}
 	return p.size();
 
 }
+
+//---------------------------------------------------------------------------------------------------
+
 CreateModes::CreateModes(const inputData& inData,int nmax):c_nmax(nmax)
 {
 	model.nbrModes=0;
@@ -66,6 +69,7 @@ CreateModes::CreateModes(const inputData& inData,int nmax):c_nmax(nmax)
 	//for n=1:500
 	for(int n =0;n<c_nmax;++n)
 	{
+		std::cout<<"mode: "<<n<<std::endl;
 		Vector norm_R(K); //norm of residuals
 
 		for(int k=0; k < K; ++k)
@@ -146,7 +150,7 @@ CreateModes::CreateModes(const inputData& inData,int nmax):c_nmax(nmax)
 					double D=F3[k];
 					f[k]=F1*D*trans(F2);
 					fna[k]=fna[k]+f[k];
-					R[k]=inData.A[k]-fna[k];
+					R[k]=inData.A[k]-fna[k]; // same R[k]-=f[k]
 				}
 
 				//std::cout<<"nbrModes "<<nbrModes<<"\n";
@@ -180,8 +184,7 @@ CreateModes::CreateModes(const inputData& inData,int nmax):c_nmax(nmax)
 			}
 
 		}
-		model.cF2=trans(model.F2);
-		model.cF3=trans(model.F3);
+
 	}
 	//-----------------------------------------------------------------------
 
@@ -190,7 +193,9 @@ CreateModes::CreateModes(const inputData& inData,int nmax):c_nmax(nmax)
 	delete[] fna;
 }
 
-void CreateModes::fitNew2(const double& newParam1, Matrix& result) const
+//---------------------------------------------------------------------------------------------------
+
+void CreateModes::fitNew_Loops(const double& newParam1, Matrix& result) const
 {
 	Vector Vinter(model.nbrModes,0);
 	//param1.find(newParam1);
@@ -208,7 +213,6 @@ void CreateModes::fitNew2(const double& newParam1, Matrix& result) const
 		result=0;
 
 		for( uint i=0; i<model.F1.rows();++i)
-		#pragma omp parallel for
 		        for (uint j=0; j<model.F2.rows();++j)
 		            for(uint mode=0;mode<model.nbrModes;++mode)
 		            	result(i,j) = result(i,j)+  model.F1(i,mode)*model.F2(j,mode)*Vinter[mode];
@@ -221,6 +225,8 @@ void CreateModes::fitNew2(const double& newParam1, Matrix& result) const
 
 
 }
+
+//---------------------------------------------------------------------------------------------------
 
 void CreateModes::fitNew(const double& newParam1, Matrix& result) const
 {
@@ -256,6 +262,8 @@ void CreateModes::fitNew(const double& newParam1, Matrix& result) const
 		std::cout<<"Enrichment is needed\n";
 	}
 }
+
+//---------------------------------------------------------------------------------------------------
 
 void CreateModes::fitNew(const double& newParam1, Matrix& result, int nModes) const
 {
@@ -304,7 +312,7 @@ void CreateModes::fitNew(const double& newParam1, Matrix& result, int nModes) co
 
 }
 
-
+//Just no cout
 //void CreateModes::fitNew(const double& newParam1, Matrix& result, int nModes) const
 //{
 //	Vector Vinter(model.nbrModes,0);
@@ -343,39 +351,110 @@ void CreateModes::fitNew(const double& newParam1, Matrix& result, int nModes) co
 //}
 //
 
-void CreateModes::fitNew3(const double& newParam1, Matrix& result, int nModes) const
+//---------------------------------------------------------------------------------------------------
+
+void CreateModes::cudaInit(int nModes)
 {
-	Vector Vinter(model.nbrModes,0);
-	//param1.find(newParam1);
+	int rows=model.F1.rows();
+	int cols=model.F2.rows();
 
-	int idx=searchUpperNearest(model.param1,newParam1);
-//	std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
-	if( idx > 0 && idx < model.param1.size())
+	if (nModes<0 || nModes > model.nbrModes)
 	{
-
-		Vector low=column(model.cF3,idx-1);
-		Vector up=column(model.cF3,idx);
-		Vector Vinter=low+(up-low)*(1.0/(model.param1[idx]-model.param1[idx-1])*(newParam1-model.param1[idx-1]));
-
-
-
-		result.resize(model.F1.rows(),model.F2.rows(),false);
-		result=0;
-		Matrix result2=result;
-		cMatrix F2temp=model.cF2;
-		F2temp.resize(nModes,model.cF2.columns());
-		for(uint mode=0;mode<nModes;++mode)
-		{
-			double temp=Vinter[mode];
-			row(F2temp,mode)=temp*row(F2temp,mode);
-		}
-
-		result= submatrix(model.F1,0,0,model.F1.rows(),nModes)*F2temp;
+		nModes=model.nbrModes;
+		blaze2opencv(model.F1,cvmodel.F1);
+		blaze2opencv(model.F2,cvmodel.F2);
+		blaze2opencv(model.F3,cvmodel.F3);
 	}
 	else
 	{
-		std::cout<<"Enrichment is needed\n";
+		blaze2opencv(submatrix(model.F1,0,0,model.F1.rows(),nModes),cvmodel.F1);
+		blaze2opencv(submatrix(model.F2,0,0,model.F2.rows(),nModes),cvmodel.F2);
+		blaze2opencv(submatrix(model.F3,0,0,model.F3.rows(),nModes),cvmodel.F3);
 	}
 
+	int CudaDevice = cv::cuda::getDevice();
+	cv::cuda::setDevice(CudaDevice);
+	cv::Mat m = cv::Mat::ones(rows, cols, opencvMatrixType);
+	cv::cuda::GpuMat d_src;
+	cv::cuda::GpuMat d_src2;
+	cv::cuda::GpuMat d_src3(cols,cols,opencvMatrixType);
+	d_src.upload(m);
+	d_src2.upload(m.t());
+
+
+	cv::cuda::gemm(d_src2, d_src, 1.0, cv::cuda::GpuMat(), 0.0, d_src3);
+	m_ifCudaInit=true;
+	d_src.download(m);
+}
+
+void CreateModes::fitNewCuda(const double& newParam1,cv::Mat &result) const
+{
+
+	double start, fin;
+	start = omp_get_wtime();
+	int nbrModes=cvmodel.F1.cols;
+	Vector Vinter(nbrModes,0);
+	//
+	int idx=searchUpperNearest(model.param1,newParam1);
+	std::cout<< omp_get_wtime() - start<<" ";//1
+
+	//		std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
+	if(( idx >= 0 && idx < model.param1.size()) )
+	{
+		start = omp_get_wtime();
+		int idxlow=idx==0?idx:idx-1;
+		Vector low = column(trans(model.F3), idxlow);
+		Vector up  = column(trans(model.F3), idx);
+
+		Vector Vinter;
+		if(idx ==0 && newParam1==model.param1[idx])
+		{
+			Vinter=low;
+		}
+		else
+		{
+
+
+			Vinter=low+(up-low)*(1.0/(model.param1[idx]-model.param1[idx-1])*(newParam1-model.param1[idx-1]));
+		}
+
+		std::cout<< omp_get_wtime() - start<<" ";//2
+		start = omp_get_wtime();
+
+		//result.create(F1.rows,F2.rows,opencvMatrixType);
+		cv::Mat F2temp=cvmodel.F2.clone();
+		std::cout<< omp_get_wtime() - start<<" ";//3
+		start = omp_get_wtime();
+		for(uint mode=0;mode<nbrModes;++mode)
+		{
+			double temp=Vinter[mode];
+			F2temp.col(mode)=temp*F2temp.col(mode);
+		}
+		std::cout<< omp_get_wtime() - start<<" ";//4
+
+		start = omp_get_wtime();
+		cv::cuda::GpuMat dummy;
+		cv::cuda::GpuMat gf1;
+		gf1.upload(cvmodel.F1);
+		cv::cuda::GpuMat gf2;
+		gf2.upload(F2temp);
+		cv::cuda::transpose(gf2,gf2);
+		cv::cuda::GpuMat gres;
+		//			cv::gemm(F1, F2temp.t(), 1.0, cv::Mat(), 0.0, result);
+		std::cout<< omp_get_wtime() - start<<" ";//5
+
+		start = omp_get_wtime();
+		cv::cuda::gemm(gf1, gf2, 1.0, cv::cuda::GpuMat(), 0.0, gres);
+		std::cout<< omp_get_wtime() - start<<" ";//6
+
+		start = omp_get_wtime();
+		gres.download(result);
+		std::cout<< omp_get_wtime() - start<<" ";//7
+
+	}
+	else
+	{
+		std::cout<<"Enrichment is needed: "<<idx<<std::endl;
+	}
 
 }

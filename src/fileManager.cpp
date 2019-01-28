@@ -52,105 +52,7 @@ void vectorSort2(Vector& p,SVector& s)
 }
 
 
-//---------------------------------------------------------------------------------------------------
 
-//Add Warnings/Errors
-//if nFiles is different in folders
-//if some of the files are empty
-
-void FileManager::readFolderOld(string foldername)
-{
-	path p = path(foldername);
-	directory_iterator it(p);
-	string filenameString="results_";
-	int nFiles=0;
-	inData.param1DegreOfFreedom=0;
-	inData.timeDegreOfFreedom=0;
-
-	inData.param1DegreOfFreedom=std::count_if(directory_iterator(p), directory_iterator(), static_cast<bool(*)(const path&)>(is_directory));
-	inData.param1.resize(inData.param1DegreOfFreedom);
-	SVector sparam1(inData.param1DegreOfFreedom);
-	int k=0;
-
-	string folderBaseName;
-	while (it != directory_iterator{})
-		if(is_directory(it->path()))
-		{
-			string folder=it->path().generic_string();
-			std::size_t	found=folder.rfind("_");
-			folderBaseName=folder.substr(0,found+1);
-			string folderParam1=folder.substr(found+1);
-			inData.param1[k]=my_stod(folderParam1);
-			sparam1[k]=folderParam1;
-//			std::cout<<k <<": "+folderParam1<<"/"<< inData.param1[k]<<" "<<std::stof(folderParam1,&sz)<<"\n";
-			directory_iterator it_files(it->path());
-			nFiles=0;
-			while (it_files != directory_iterator{})
-			{
-				string file=basename(it_files->path());
-				//std::cout<<file<<" "<<file.compare(0,filenameString.size(),filenameString)<<'\n';
-				it_files++;
-				if(!file.compare(0,filenameString.size(),filenameString))
-					nFiles++;
-			}
-			it++;
-			k++;
-		}
-	//!SORT param1 array++++++++
-	vectorSort2(inData.param1,sparam1);
-	//+++++++++++++++++++++++++++
-
-	inData.timeDegreOfFreedom=nFiles;
-	//	std::cout << "\n";
-	it=directory_iterator(p);
-	//count number of rows and columns in result files
-	//--------------------------------------------
-	std::ifstream myfile;
-	string new_filename = it->path().generic_string() + string("/")+filenameString+string("0.txt");
-	myfile.open(new_filename);
-	inData.spaceDegreOfFreedom=std::count(std::istreambuf_iterator<char>(myfile),
-			std::istreambuf_iterator<char>(), '\n');
-	string row1;
-	myfile.clear();
-	myfile.seekg(0, std::ios::beg);
-	std::getline(myfile,row1);
-	std::stringstream stream(row1);
-	int cols=std::distance(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>());
-	//--------------------------------------------
-
-	//Fill the matrix array
-	//--------------------------------------------
-	//inData.A=new Matrix[inData.param1DegreOfFreedom];
-	inData.init();
-	k=0;
-	int colNeeded=4;
-	//	while (it != directory_iterator{})
-	//	{
-	for (int k=0;k<inData.param1DegreOfFreedom;++k)
-	{
-		//		path file=it->path();
-		path file(folderBaseName+sparam1[k]);
-		Matrix m1p(inData.spaceDegreOfFreedom,inData.timeDegreOfFreedom);
-		for (int t =0;t<inData.timeDegreOfFreedom;++t)
-		{
-			Matrix m1t(inData.spaceDegreOfFreedom,cols);
-			new_filename = file.generic_string() + string("/")+filenameString+std::to_string(t)+string(".txt");
-			read(new_filename, m1t);
-			auto cl=columns(m1t,{colNeeded});
-
-			auto sm=submatrix( m1p, 0, t, m1p.rows(),1 );
-			sm = cl;
-
-		}
-		inData.A[k]=m1p;
-
-		//		it++;
-		//		k++;
-	}
-	//--------------------------------------------
-
-
-}
 //---------------------------------------------------------------------------------------------------
 
 void FileManager::readFolder(string foldername)
@@ -206,7 +108,11 @@ void FileManager::readFolder(string foldername)
 
 
 }
+//---------------------------------------------------------------------------------------------------
+void FileManager::readFolder(string filename, myMatrix& m)
+{
 
+}
 //---------------------------------------------------------------------------------------------------
 void FileManager::read(string filename, Matrix& m)
 {
@@ -311,8 +217,6 @@ bool FileManager::loadModel(string dirPath, Model& model)
 	read(dirPath+"F1.dat", model.F1);
 	read(dirPath+"F2.dat", model.F2);
 	read(dirPath+"F3.dat", model.F3);
-	model.cF2=trans(model.F2);
-	model.cF3=trans(model.F3);
 
 	return true;
 }
@@ -366,7 +270,105 @@ void FileManager::readODB(string filename, Matrix& m)
 //---------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
 
+//Add Warnings/Errors
+//if nFiles is different in folders
+//if some of the files are empty
+
+//void FileManager::readFolderOld(string foldername)
+//{
+//	path p = path(foldername);
+//	directory_iterator it(p);
+//	string filenameString="results_";
+//	int nFiles=0;
+//	inData.param1DegreOfFreedom=0;
+//	inData.timeDegreOfFreedom=0;
+//
+//	inData.param1DegreOfFreedom=std::count_if(directory_iterator(p), directory_iterator(), static_cast<bool(*)(const path&)>(is_directory));
+//	inData.param1.resize(inData.param1DegreOfFreedom);
+//	SVector sparam1(inData.param1DegreOfFreedom);
+//	int k=0;
+//
+//	string folderBaseName;
+//	while (it != directory_iterator{})
+//		if(is_directory(it->path()))
+//		{
+//			string folder=it->path().generic_string();
+//			std::size_t	found=folder.rfind("_");
+//			folderBaseName=folder.substr(0,found+1);
+//			string folderParam1=folder.substr(found+1);
+//			inData.param1[k]=my_stod(folderParam1);
+//			sparam1[k]=folderParam1;
+//			//			std::cout<<k <<": "+folderParam1<<"/"<< inData.param1[k]<<" "<<std::stof(folderParam1,&sz)<<"\n";
+//			directory_iterator it_files(it->path());
+//			nFiles=0;
+//			while (it_files != directory_iterator{})
+//			{
+//				string file=basename(it_files->path());
+//				//std::cout<<file<<" "<<file.compare(0,filenameString.size(),filenameString)<<'\n';
+//				it_files++;
+//				if(!file.compare(0,filenameString.size(),filenameString))
+//					nFiles++;
+//			}
+//			it++;
+//			k++;
+//		}
+//	//!SORT param1 array++++++++
+//	vectorSort2(inData.param1,sparam1);
+//	//+++++++++++++++++++++++++++
+//
+//	inData.timeDegreOfFreedom=nFiles;
+//	//	std::cout << "\n";
+//	it=directory_iterator(p);
+//	//count number of rows and columns in result files
+//	//--------------------------------------------
+//	std::ifstream myfile;
+//	string new_filename = it->path().generic_string() + string("/")+filenameString+string("0.txt");
+//	myfile.open(new_filename);
+//	inData.spaceDegreOfFreedom=std::count(std::istreambuf_iterator<char>(myfile),
+//			std::istreambuf_iterator<char>(), '\n');
+//	string row1;
+//	myfile.clear();
+//	myfile.seekg(0, std::ios::beg);
+//	std::getline(myfile,row1);
+//	std::stringstream stream(row1);
+//	int cols=std::distance(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>());
+//	//--------------------------------------------
+//
+//	//Fill the matrix array
+//	//--------------------------------------------
+//	//inData.A=new Matrix[inData.param1DegreOfFreedom];
+//	inData.init();
+//	k=0;
+//	int colNeeded=4;
+//	//	while (it != directory_iterator{})
+//	//	{
+//	for (int k=0;k<inData.param1DegreOfFreedom;++k)
+//	{
+//		//		path file=it->path();
+//		path file(folderBaseName+sparam1[k]);
+//		Matrix m1p(inData.spaceDegreOfFreedom,inData.timeDegreOfFreedom);
+//		for (int t =0;t<inData.timeDegreOfFreedom;++t)
+//		{
+//			Matrix m1t(inData.spaceDegreOfFreedom,cols);
+//			new_filename = file.generic_string() + string("/")+filenameString+std::to_string(t)+string(".txt");
+//			read(new_filename, m1t);
+//			auto cl=columns(m1t,{colNeeded});
+//
+//			auto sm=submatrix( m1p, 0, t, m1p.rows(),1 );
+//			sm = cl;
+//
+//		}
+//		inData.A[k]=m1p;
+//
+//		//		it++;
+//		//		k++;
+//	}
+//	//--------------------------------------------
+//
+//
+//}
 //bool FileManager::loadModel(string dirPath, Model& model)
 //{
 //

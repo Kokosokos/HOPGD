@@ -15,22 +15,30 @@
 class CreateModes
 {
 public:
-	CreateModes():c_nmax(500)
+	CreateModes():c_nmax(500),m_ifCudaInit(false)
 	{
 	}
 	CreateModes(const inputData& inData,int nmax=500);
 
+	//using triple nested loop
+	void fitNew_Loops(const double& newParam1, Matrix& result) const;
+
+	//using blaze matrix multiplication
 	void fitNew(const double& newParam1, Matrix& result) const;
-	void fitNew2(const double& newParam1, Matrix& result) const;
 	void fitNew(const double& newParam1, Matrix& result, int nModes) const;
-	void fitNew3(const double& newParam1, Matrix& result, int nModes) const;
-	 //aproximation rank, # of Modes
-	//MVector Model;
+
+	//using opencv::cuda matrix multiplication
+	void cudaInit(int nModes=-1);
+	void fitNewCuda(const double& newParam1, cv::Mat &result) const;
+
+
 
 	Model model;
+	cvModel cvmodel;
 
 private:
 	const int c_nmax;
+	bool m_ifCudaInit;
 };
 
 #endif /* CREATEMODES_H_ */
