@@ -52,16 +52,6 @@ struct inputData
 	~inputData(){ delete[] A;};
 };
 
-struct NinputData
-{
-	float error;
-
-	myMatrix M;
-	inputData(){};
-	void init(){};
-	~inputData(){};
-};
-
 struct Model
 {
 	int nbrModes;
