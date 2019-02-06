@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> /* strtof */
 #include "fileManager.h"
-#include "mymatrix.h"
+//#include "mymatrix3.h"
 
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;
@@ -108,11 +108,9 @@ void FileManager::readFolder(string foldername)
 
 
 }
-//---------------------------------------------------------------------------------------------------
-void FileManager::readFolder(string filename, myMatrix& m)
-{
 
-}
+
+
 //---------------------------------------------------------------------------------------------------
 void FileManager::read(string filename, Matrix& m)
 {
@@ -180,6 +178,30 @@ void FileManager::saveModel(string dirPath, const Model& model)
 	write(dirPath+"F1.dat", model.F1);
 	write(dirPath+"F2.dat", model.F2);
 	write(dirPath+"F3.dat", model.F3);
+}
+
+void FileManager::saveModel(string dirPath, const NModel& model)
+{
+
+	std::ofstream outFile;
+	outFile.open((dirPath+"model.dat").c_str(), std::ios_base::out);
+	outFile<<model.nbrModes<<" ";
+	outFile<<"\n";
+	for (int d=0;d<model.F.size();++d)
+		outFile<<model.F[d].rows()<<" ";
+	outFile<<"\n";
+
+	std::cout<<model.params.size()<<" "<<model.params[0].size()<<std::endl;
+	for (int i=0;i<model.params.size();++i)
+	{
+		for (int j=0;j<model.params[i].size();++j)
+			outFile<<model.params[i][j]<<" ";
+		outFile<<"\n";
+	}
+	outFile.close();
+	for (int d=0;d<model.F.size();++d)
+		write(dirPath+"/F"+std::to_string(d)+".dat", model.F[d]);
+
 }
 //---------------------------------------------------------------------------------------------------
 
@@ -257,7 +279,231 @@ void FileManager::readODB(string filename, Matrix& m)
 	myOdb.close();
 	odb_finalizeAPI();
 }
+
 //---------------------------------------------------------------------------------------------------
+//Makes sure parameters are sorted and files are read in right order
+//Creates EMPTY myMatrix
+void FileManager::readFolder(string foldername, NinputData& Ndata)
+{
+	path p = path(foldername);
+	directory_iterator it(p);
+	string filenameString="heatTransfer_Conductivity_";
+	int nFiles=0;
+
+	int spaceDegreOfFreedom=0;
+	int timeDegreOfFreedom=0;
+	int param1DegreOfFreedom=std::count_if(directory_iterator(p), directory_iterator(), static_cast<bool(*)(const path&)>(is_directory));
+
+	Ndata.params.push_back(Vector(param1DegreOfFreedom,0));
+	SVector sparam1(param1DegreOfFreedom);
+	int k=0;
+
+	string folderBaseName;
+	while (it != directory_iterator{})
+		if(is_directory(it->path()))
+		{
+			string folder=it->path().generic_string();
+			std::size_t	found=folder.rfind("_");
+			folderBaseName=folder.substr(0,found+1);
+			string folderParam1=folder.substr(found+1);
+			Ndata.params[0][k]=my_stod(folderParam1);
+			sparam1[k]=folderParam1;
+			it++;
+			k++;
+		}
+	//!SORT param1 array++++++++
+	vectorSort2(Ndata.params[0],sparam1);
+	//+++++++++++++++++++++++++++
+	k=0;
+	path file(folderBaseName+sparam1[k]);
+	string new_filename = file.generic_string() + string("/")+filenameString+sparam1[k]+string(".odb");
+	readODB_SpacexTime(new_filename,spaceDegreOfFreedom,timeDegreOfFreedom);
+
+	intVector sizes(3,0);
+	sizes[0]=spaceDegreOfFreedom;
+	sizes[1]=timeDegreOfFreedom;
+	sizes[2]=param1DegreOfFreedom;
+	Ndata.A.setSize(3,sizes);
+	Ndata.A.resetCurrentPosition();
+	for (int k=0;k<param1DegreOfFreedom;++k)
+	{
+		path file(folderBaseName+sparam1[k]);
+		string new_filename = file.generic_string() + string("/")+filenameString+sparam1[k]+string(".odb");
+		readODB(new_filename, Ndata.A,sizes);
+
+	}
+	//--------------------------------------------
+
+
+}
+
+//---------------------------------------------------------------------------------------------------
+void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, intVector param_sizes)
+{
+	//!SORT parameters array++++++++!!!
+//	vectorSort2(Ndata.params[0],sparam1);
+	//+++++++++++++++++++++++++++
+	int spaceDegreOfFreedom=0;
+	int timeDegreOfFreedom=0;
+	string new_filename = foldername + string("/1/just.odb");
+	readODB_SpacexTime(new_filename,spaceDegreOfFreedom,timeDegreOfFreedom);
+
+	intVector sizes(dim,0);
+	sizes[0]=spaceDegreOfFreedom;
+	sizes[1]=timeDegreOfFreedom;
+	for(int d=2;d<dim;++d)
+	{
+		sizes[d]=param_sizes[d-2];
+	}
+	Ndata.A.setSize(dim,sizes);
+	Ndata.A.resetCurrentPosition();
+	Matrix M(spaceDegreOfFreedom,timeDegreOfFreedom);
+
+	std::cout<<"chck1\n";
+	vector<Vector> allParams;
+	for (int k=1;k<Ndata.A.m_paramSize+1;++k)
+	{
+
+		string folder=foldername+"/"+std::to_string(k)+"/";
+		string fname=folder+"just.odb";
+		std::cout<<fname<<"\n";
+		readODB2(fname, M);
+		Ndata.A.setNext(M);
+		fname=folder+"params.dat";
+		std::ifstream inFile;
+
+		inFile.open(fname, std::ios_base::in);
+		double temp=0;
+		Vector param(dim-2,0);
+		std::cout<<"params: ";
+//		for(int d=0;d<dim-2;++d)
+//		{
+//			inFile>>temp;
+//			param[d]=temp;
+//			Ndata.params.push_back(param);
+//			std::cout<<temp<<" ";
+//		}
+		//TEMPORARY
+		for(int d=-1;d<dim-2;++d)
+		{
+			inFile>>temp;
+			if(d>=0)
+			{
+				param[d]=temp;
+
+				std::cout<<temp<<" ";
+			}
+		}
+		allParams.push_back(param);
+
+		std::cout<<"\n";
+		inFile.close();
+
+	}
+//	std::reverse(allParams.begin(), allParams.end());
+
+	int jump=1;//Ndata.A.m_matrix_size;
+	std::cout<<"parameters: \n";
+	for(int d=2;d<dim;++d)
+	{
+		Vector v(Ndata.A.sizes()[d]);
+		for(int j=0;j<Ndata.A.sizes()[d];j++)
+		{
+			std::cout<<allParams[j*jump][dim-1-(d)]<<" ";
+			v[j]=allParams[j*jump][dim-1-(d)];
+		}
+		Ndata.params.push_back(v);
+		std::cout<<"\n"<<v<<std::endl;
+		jump*=Ndata.A.sizes()[d];
+	}
+	std::cout<<"\n";
+	//--------------------------------------------
+
+
+}
+//---------------------------------------------------------------------------------------------------
+
+void FileManager::readODB2(string filename, Matrix& m)
+{
+	odb_initializeAPI();
+
+	odb_Odb& myOdb = openOdb(filename.c_str(), true);
+
+	odb_Step& step = myOdb.steps()["Step-1"];
+	odb_SequenceFrame& allFramesInStep = step.frames();
+
+	for(int timeID =0;timeID<m.columns();++timeID)
+	{
+		const odb_SequenceFieldValue& temp =
+				allFramesInStep[timeID].fieldOutputs()["NT11"].values();
+		int numComp = 0;
+		for (int spaceID=0; spaceID<m.rows(); spaceID++)
+		{
+			const odb_FieldValue val = temp[spaceID];
+			const float* const NT11 = val.data(numComp);
+			int comp=0;
+//			for (int comp=0;comp<numComp;comp++)
+			m(spaceID,timeID)= NT11[comp];
+		}
+//	cout<<timeID<<endl;
+
+	}
+
+	myOdb.close();
+	odb_finalizeAPI();
+}
+//---------------------------------------------------------------------------------------------------
+void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, int& timeDegreOfFreedom)
+{
+	odb_initializeAPI();
+//
+	odb_Odb& myOdb = openOdb(filename.c_str(), true);
+	odb_StepRepository& steps = myOdb.steps();
+	odb_String stepName("Step-1",6);
+	odb_Step& step = steps[stepName];
+
+//	odb_Step& step = myOdb.steps()["Step-1"];
+	odb_SequenceFrame& allFramesInStep = step.frames();
+	int numFrames = allFramesInStep.size();
+	numFrames=c_tmax;
+	timeDegreOfFreedom=numFrames;
+	int numValues = allFramesInStep[numFrames-1].fieldOutputs()["NT11"].values().size();
+	spaceDegreOfFreedom=numValues;
+	myOdb.close();
+	odb_finalizeAPI();
+}
+
+//Appends data to myMatrix
+void FileManager::readODB(string filename, myMatrix& m,intVector sizes)
+{
+	odb_initializeAPI();
+
+	int spaceDegreOfFreedom=sizes[0];
+	int timeDegreOfFreedom=sizes[1];
+	odb_Odb& myOdb = openOdb(filename.c_str(), true);
+
+	odb_StepRepository& steps = myOdb.steps();
+	odb_String stepName("Step-1",6);
+	odb_Step& step = steps[stepName];	odb_SequenceFrame& allFramesInStep = step.frames();
+	for(int timeID =0;timeID<timeDegreOfFreedom;++timeID)
+	{
+		const odb_SequenceFieldValue& temp =
+				allFramesInStep[timeID].fieldOutputs()["NT11"].values();
+		int numComp = 0;
+		for (int spaceID=0; spaceID<spaceDegreOfFreedom; spaceID++)
+		{
+			const odb_FieldValue val = temp[spaceID];
+			const float* const NT11 = val.data(numComp);
+			int comp=0;
+			m.setNext(double(NT11[comp]));
+		}
+
+	}
+
+
+	myOdb.close();
+	odb_finalizeAPI();
+}
 //---------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------

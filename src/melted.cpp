@@ -77,27 +77,26 @@ void validation(string valJobsFolder,string outFolderName,const CreateModes& mod
 }
 void TESTconstNumberOfmodes(int nmax,string snapshots_dir,string valJobsFolder,string outFolderName, bool useValidation=true)
 {
-	std::clock_t start;
-	std::clock_t fin;
+	double start;
 	//Reading snapshots
 	//-----------------------------------------------------------------------
 	FileManager file_manager;
 	std::cout<<"Reading files: ";
-	start = std::clock();
+	start = omp_get_wtime();
 	file_manager.readFolder(snapshots_dir);
 	inputData &inData=file_manager.inData;
 	inData.error=0.00001;
-	std::cout<<( std::clock() - start ) / (double) CLOCKS_PER_SEC<<" sec"<<"\n";
+	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
 
 
 	//Create model
 	//-----------------------------------------------------------------------
 	std::cout<<"Creating modes: ";
-	start = std::clock();
+	start = omp_get_wtime();
 	CreateModes modesCreator(inData,nmax);
+	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
 	file_manager.saveModel(outFolderName,modesCreator.model);
 
-	std::cout<<( std::clock() - start ) / (double) CLOCKS_PER_SEC<<" sec"<<"\n";
 	std::cout<<"#modes = "<<modesCreator.model.nbrModes<<std::endl;
 	//Validation
 	//----------------------------------------------------------------------
@@ -220,7 +219,7 @@ int main3(int argc, char * argv[])
 	string snapshots_dir ="/home/ikriuchevs/workspace/melted/tests/369/Snapshots/TxtOutPutFiles/";
 	string valJobsForlder="/home/ikriuchevs/workspace/melted/tests/369/Snapshots/ValidationJobs/";
 	string outFolder="/home/ikriuchevs/workspace/melted/tests/369/testsCpp/";
-	//		TESTconstNumberOfmodes(100,snapshots_dir,valJobsForlder,outFolder);
+	TESTconstNumberOfmodes(100,snapshots_dir,valJobsForlder,outFolder);
 	//	TESTonlinePart(valJobsForlder,outFolder,1);
 	//	TESTonlinePart(valJobsForlder,outFolder,5);
 	//	TESTonlinePart(valJobsForlder,outFolder,10);
@@ -286,9 +285,9 @@ bool fileExists(const odb_String  &string);
 void rightTrim(odb_String  &string,const char* char_set);
 void printExecutionSummary();
 /***************************************************************/
-
+#include "odb_MaterialTypes.h"
 using namespace std;
-int mainOdb(int argc, char **argv)
+int main327532(int argc, char **argv)
 {
 
 
@@ -300,25 +299,15 @@ int mainOdb(int argc, char **argv)
 	//  char *abaCmd = argv[0];
 	odb_initializeAPI();
 	odb_String odbPath;
-	odbPath = "/home/ikriuchevs/workspace/melted/tests/369/Snapshots/JobsGarbage/Conductivity_250/heatTransfer_Conductivity_250.odb";
-	FileManager fm;
-	Matrix m;
-	fm.readODB(odbPath.CStr(),m);
-	std::string folder_path = "/home/ikriuchevs/workspace/melted/tests/369/Snapshots/JobsGarbage/";
-	fm.readFolder(folder_path);
-	fm.write("temp.odb.dat",fm.inData.A[0]);
+	odbPath = "/home/ikriuchevs/workspace/melted/tests/Ndim/Jobs/1/just.odb";
 
-	//	fm.readFolder(folder_path);
-	//	fm.write("temp.txt.dat",fm.inData.A[0]);
-	exit(1);
-	//	odbPath = "/home/ikriuchevs/workspace/melted/tests/369/Snapshots/TxtOutPutFiles/Conductivity_205.0/viewer_tutorial.odb";
 	bool ifOdbName = false;
-	if (!fileExists(odbPath))
-	{
-		cerr << "**ERROR** output database  " << odbPath.CStr()
-                    								 << " does not exist\n" << endl;
-		exit(1);
-	}
+//	if (!fileExists(odbPath))
+//	{
+//		cerr << "**ERROR** output database  " << odbPath.CStr()
+//                    																										 << " does not exist\n" << endl;
+//		exit(1);
+//	}
 	ifOdbName = true;
 	cout<<"HEloo"<<endl;
 	//  for (int arg = 0; arg<argc; arg++)
@@ -360,6 +349,7 @@ int mainOdb(int argc, char **argv)
 
 	odb_Odb& myOdb = openOdb(odbPath, true);
 
+	odb_Material mymat;
 	//	odb_Odb& myOdb = Odb(odbPath);
 	cout<<"Accessing rootAssemly"<<endl;
 	odb_Assembly& myAssembly = myOdb.rootAssembly();
@@ -400,7 +390,7 @@ int mainOdb(int argc, char **argv)
 		const odb_SequenceFieldLocation& seqLoc =
 				field.locations();
 		cout << field.name().CStr() << " : " << field.description().CStr()
-	        				<< endl;
+	        																						<< endl;
 		cout << "    Type: " << field.type() << endl;
 		int numLoc = seqLoc.size();
 		for (int loc = 0; loc<numLoc; loc++){
@@ -412,20 +402,21 @@ int mainOdb(int argc, char **argv)
 
 	//	    const odb_SequenceFieldValue& displacements =
 	//	    		lastFrame.fieldOutputs()["NT11"].values();
+
 	int timeID=0;
-	const odb_SequenceFieldValue& displacements =
-			allFramesInStep[timeID].fieldOutputs()["NT11"].values();
-	int numValues = displacements.size();
-	int numComp = 0;
-	for (int i=0; i<numValues; i++) {
-		const odb_FieldValue val = displacements[i];
-		cout << "Node = " << val.nodeLabel();
-		const float* const NT11 = val.data(numComp);
-		cout << ", T = ";
-		for (int comp=0;comp<numComp;comp++)
-			cout << NT11[comp] << "  ";
-		cout << endl;
-	}
+//	const odb_SequenceFieldValue& displacements =
+//			allFramesInStep[timeID].fieldOutputs()["NT11"].values();
+//	int numValues = displacements.size();
+//	int numComp = 0;
+//	for (int i=0; i<numValues; i++) {
+//		const odb_FieldValue val = displacements[i];
+//		cout << "Node = " << val.nodeLabel();
+//		const float* const NT11 = val.data(numComp);
+//		cout << ", T = ";
+//		for (int comp=0;comp<numComp;comp++)
+//			cout << NT11[comp] << "  ";
+//		cout << endl;
+//	}
 
 	myOdb.close();
 	odb_finalizeAPI();
@@ -437,130 +428,93 @@ int mainOdb(int argc, char **argv)
 //searching for F[dimId], the rest F[i] i!=dimId are considered to be known
 //R-residuals matrix
 
-void findF(int dimId, myMatrix& R, Vector* F);
-void findApprox( myMatrix& R, Vector* F);
-NModel HOPGD( const myMatrix& M, double ec);
-int main(int argc, char * argv[])
+
+#include "mymatrix3.h"
+void findApprox( myMatrix3& R, Vector* F);
+void findF3(const int& dimId, myMatrix3& R, Vector* F);
+
+NModel HOPGD( const myMatrix3& M, double ec)
 {
-//	int dim=3;
-//
-//	intVector sizes(dim,2);
-//	sizes[0]=2;
-//	sizes[1]=2;
-//	sizes[2]=3;
-//
-//	int arr[12]={1,2,3,4,    1,4,9,16,  3,12,27,48};
-//
-
-	int dim=4;
-
-	intVector sizes(dim,2);
-	sizes[0]=2;
-	sizes[1]=2;
-	sizes[2]=3;
-	sizes[3]=2;
-
-	int arr[24]={1,2,3,4,    1,4,9,16,  3,12,27,48,
-				 5,1,3,14,  21,4,9, 6,  8,11,17, 8};
-
-
-	cout<<"Start!"<<endl;
-
-
-	//Create and fill matrix
-	myMatrix M(dim,sizes);
-	int i=0;
-	while(M.setNext(arr[i]))
-	{
-		i++;
-	}
-	//Print matrix M in linear fasion
-	M.resetCurrentPosition();
-	while(!M.ifEndPosition())
-	{
-		cout<<M.getCurrentVal()<<" ";
-		M.next();
-	}
-	cout<<"\n";
-	//test HOPGD sum routine (findF function)
-
-	double eBc=0.000001;
-	double ec=0.001;
-	NModel model=HOPGD( M,ec);
-
-	cout<<"\nLets see some F1!"<<endl;
-	for(int ii=0; ii< model.F[2].rows();++ii)
-	{
-		for(int j=0; j< model.F[2].columns();++j)
-		{
-			cout<<model.F[2](ii,j)<<" ";
-		}
-		cout<<"\n";
-	}
-	cout<<"\nFinish!"<<endl;
-	return(0);
-
-}
-
-NModel HOPGD( const myMatrix& M, double ec)
-{
-
+	const int c_nmax=100;
+	double start,fin;
+//	start = omp_get_wtime();
 	const double eBc=0.000001;
-	const int c_nmax=500;
 	const int vmax=200;
 	intVector sizes=M.sizes();
 	int dim=M.dimensionality();
 
 	NModel model(dim);
-	myMatrix fna(dim, sizes);
-	myMatrix R=M;
+	myMatrix3 fna(dim, sizes);
+	myMatrix3 f(dim, sizes);
+	myMatrix3 R=M;
 	Vector *F;
 	F=new Vector[dim];
-
-
+//	std::cout<< "Prep time: "<<omp_get_wtime()-start<<std::endl;
+	double findFtime=0;
+	double findFnorm=0;
+	cout<<M.m_values[0]<<endl;
 	for (int n=0;n<c_nmax;++n)
 	{
-		cout<<"    Distance:"<<R.dist(M)<<endl;
+		double normBF=1;
+		double prevNorm=1;
+
+		double start,fin;
+		std::cout<<n<<"\n";
+//		start = omp_get_wtime();
+
 		if(R.dist(M) < ec )
 		{
-			cout<<"!!!!CONGRATULATIONS!!!!!\n";
+			std::cout<<"!!!!CONGRATULATIONS!!!!!\n";
 			break;
 		}
-		//Initialial values
+
 		Vector bta1=Vector(dim,0);
 		Vector br1=Vector(dim,1);
 		Vector bt1=Vector(dim,0);
-		myMatrix f(dim, sizes);
+
 		for(int d =0;d<dim;d++)
 		{
 			F[d]=Vector(sizes[d],1); //Must come from M or model
+			normBF*=blaze::sqrNorm(F[d]);
+
 		}
 
 		for (int v=0;v<vmax;++v)
 		{
 			bool e1=true;
+
+//			start = omp_get_wtime();
 			for(int m=0;m<dim;++m)
 			{
-				findF(m,R,F);
+
+				double currNorm=blaze::sqrNorm(F[m]);
+				normBF/=currNorm;
+				normBF*=prevNorm;
+				findF3(m,R,F);
+				F[m]=F[m]/normBF;
+
 				bt1[m]=blaze::norm(F[m]);
+				prevNorm=bt1[m]*bt1[m];
+//				std::cout<<(trans(F[m])*F[m])<<"  "<<bt1[m]<<std::endl;
 				if(v==0)
 				{
 					br1[m]=bt1[m];
 				}
+
 				e1=e1&&((bt1[m]-bta1[m])/br1[m]<eBc);
 			}
+//			fin = omp_get_wtime();
+//			findFtime=findFtime+fin-start;
 			if(e1)
 			{
 				findApprox( f, F);
+				cout<<"=============="<<n<<"=========="<<endl;
+				cout<<M.m_values[0]<<endl;
 
 				R=R-f;
 				fna=fna+f;
-				fna.resetCurrentPosition();
-				while(!fna.ifEndPosition())
-				{
-					cout<<fna.getCurrentVal()<<" ";
-					fna.next();
-				}
+				cout<<fna.m_values[0]<<endl;
+
 
 				//Store n-mode functions in NModel structure
 				for(int m=0;m<dim;++m)
@@ -577,63 +531,394 @@ NModel HOPGD( const myMatrix& M, double ec)
 			{
 				bta1=bt1;
 			}
+
 		}
+
 
 	}
 	delete[] F;
 	return model;
-}
-void findApprox( myMatrix& R, Vector* F)
-{
-
-	int dim=R.dimensionality();
-	intVector idx(dim,0);
-	R.resetCurrentPosition();
-	while(!R.ifEndPosition())
-	{
-		R.getCurrentIdx(idx);
-		double fMult=1;
-		for(int d=0;d<dim;d++)
-			fMult*=F[d][idx[d]];
-		R.setElement(R.getCurrentPosition(),fMult);
-		//		cout<<fMult<<" ";
-		R.next();
-	}
-	//	cout<<"\n";
+//	std::cout<<"findFtime: "<<findFtime<<std::endl;
+//	std::cout<<"findFnorm: "<<findFnorm<<std::endl;
+//	nmodel=model;
 
 }
-void findF(int dimId, myMatrix& R, Vector* F)
+
+//---------------------------------------------------------------------------------------------------
+
+void findF(const int& dimId, myMatrix& R, Vector* F)
 {
 	R.resetCurrentPosition();
 	F[dimId]=Vector(F[dimId].size(),1);
 	Vector newF=Vector(F[dimId].size(),0);
 	int dim=R.dimensionality();
 	intVector idx(dim,0);
-
+	double fMult;
 	while(!R.ifEndPosition())
+		//	while(R.ifNotEndPosition())
 	{
+		fMult=1;
+
 		R.getCurrentIdx(idx);
-		double fMult=1;
+
+		//		for(int d=0;d<dim;d++)
+		//			fMult*=F[d][idx[d]];
+
 		for(int d=0;d<dim;d++)
 			fMult*=F[d][idx[d]];
-		newF[idx[dimId]]+=R.getElement(idx)*fMult;
+//
+//		for(int d=0;d<dimId;++d)
+//			fMult*=F[d][idx[d]];
+//		for(int d=dimId+1;d<dim;++d)
+//			fMult*=F[d][idx[d]];
+		newF[idx[dimId]]+=R.getCurrentVal()*fMult;
 		R.next();
 	}
+	F[dimId]=newF;
+}
 
+void findF3(const int& dimId, myMatrix3& R, Vector* F)
+{
+	R.resetCurrentPosition();
+	F[dimId]=Vector(F[dimId].size(),1);
+	Vector newF=Vector(F[dimId].size(),0);
+	int dim=R.dimensionality();
+	intVector idx(dim,0);
+	double fMult;
+
+	if(dimId ==0) //0 or 1 (space/time, or 2 max size dimensions)
+	{
+		for(int k=0;k<R.m_paramSize;++k)
+		{
+			R.getCurrentIdx(idx);
+			fMult=1;
+			for(int d=2;d<dim;++d)
+			{
+				fMult*=F[d][idx[d]];
+			}
+			newF+=R.m_values[k]*F[1]*fMult;
+			R.next();
+		}
+		//		newF[idx[dimId]]+=(trans(F[0])*R.m_values[k]*F[1])*fMult;
+	}
+	else if(dimId==1)
+	{
+		for(int k=0;k<R.m_paramSize;++k)
+		{
+			R.getCurrentIdx(idx);
+			fMult=1;
+			for(int d=2;d<dim;++d)
+			{
+				fMult*=F[d][idx[d]];
+			}
+			newF+=trans(R.m_values[k])*F[0]*fMult;
+			R.next();
+		}
+
+	}
+	else
+	{
+		for(int k=0;k<R.m_paramSize;++k)
+		{
+			R.getCurrentIdx(idx);
+			fMult=1;
+			for(int d=2;d<dim;++d)
+				fMult*=F[d][idx[d]];
+			newF[idx[dimId]]+=(trans(F[0])*R.m_values[k]*F[1])*fMult;
+			R.next();
+		}
+	}
 
 	double normBF=1;
-	for(int d=0;d<dim;d++)
-	{
-		if (d!=dimId)
-			normBF*=(trans(F[d])*F[d]);
-	}
-	//	cout<<"normBf="<<normBF<<endl;
+//	for(int d =0;d<dim;d++)
+//	{
+//		if(d!=dimId)
+//		normBF*=blaze::sqrNorm(F[d]);
+//
+//	}
 	F[dimId]=newF/normBF;
-	//	cout<<"Fi={";
-	//
-	//	for (int i=0;i<newF.size();i++)
-	//		cout<<F[dimId][i]<<", ";
-	//
-	//	cout<<"}\n";
 }
+
+//---------------------------------------------------------------------------------------------------
+void findApprox( myMatrix3& R, Vector* F)
+{
+
+	int dim=R.dimensionality();
+	intVector idx(dim,0);
+	R.resetCurrentPosition();
+	Matrix M(R.sizes()[0],R.sizes()[1]);
+	for(int k=0;k<R.m_paramSize;++k)
+	{
+
+		R.getCurrentIdx(idx);
+		double fMult=1;
+		for(int d=2;d<dim;d++)
+			fMult*=F[d][idx[d]];
+		M=F[0]*fMult*trans(F[1]);
+		R.setNext(M);
+	}
+
+}
+
+
+int main234(int argc, char * argv[])
+{
+
+	//initialize and fill test matrix 3x3
+
+
+	unsigned int dim=4;
+	intVector sizes(dim,dim);
+	sizes[0]=5;
+	sizes[1]=4;
+	sizes[2]=3;
+	sizes[3]=2;
+	Matrix m(sizes[0],sizes[1],0);
+	for (int i=0;i<sizes[0];++i)
+	{
+		for (int j=0;j<sizes[1];++j)
+		{
+			m(i,j)=i+i*j+1; cout<<m(i,j)<<" ";
+		}
+		cout<<endl;
+	}
+
+
+	myMatrix3 m3(dim,sizes);
+	m3.setNext(m);
+	m3.setNext(3*m);
+	m3.setNext(5*m);
+
+	m3.setNext(2*m);
+	m3.setNext(4*m);
+	m3.setNext(6*m);
+
+	NModel nm = HOPGD( m3, 0.01);
+	FileManager fmmm;
+	fmmm.saveModel("/home/ikriuchevs//workspace/melted/tests/Ndim/testNmodelSave/", nm);
+	return(0);
+
+
+	//	blaze::setNumThreads( 4 );
+	//	omp_set_num_threads(4);
+	NinputData input;
+	FileManager fm;
+	myMatrix M;
+	//Reading snapshots
+	string snapshots_dir ="/home/ikriuchevs/workspace/melted/tests/369/Snapshots/TxtOutPutFiles/";
+	string valJobsFolder="/home/ikriuchevs/workspace/melted/tests/369/Snapshots/ValidationJobs/";
+	string outFolder="/home/ikriuchevs/workspace/melted/tests/369/testsCpp/ND/";
+	string outFolder2="/home/ikriuchevs/workspace/melted/tests/369/testsCpp/ND2/";
+
+	//	snapshots_dir ="/home/ikriuchevs/workspace/melted/tests/128320/Snapshots/TxtOutPutFiles/";
+	//	valJobsFolder="/home/ikriuchevs/workspace/melted/tests/128320/Snapshots/ValidationJobs/";
+	//	outFolder="/home/ikriuchevs/workspace/melted/tests/128320/testsCpp/ND/";
+	//	outFolder2="/home/ikriuchevs/workspace/melted/tests/128320/testsCpp/ND2/";
+
+	//	snapshots_dir ="/home/ikriuchevs/workspace/melted/tests/11256/Snapshots/TxtOutPutFiles/";
+	//	valJobsFolder="/home/ikriuchevs/workspace/melted/tests/11256/Snapshots/ValidationJobs/";
+	//	outFolder="/home/ikriuchevs/workspace/melted/tests/11256/testsCpp/ND/";
+
+
+	double start = omp_get_wtime();
+	std::cout<<"Reading Files: ";
+	fm.readFolder(snapshots_dir, input);
+
+	FileManager file_manager;
+	std::cout<<"Reading files: ";
+	file_manager.readFolder(snapshots_dir);
+	inputData &inData=file_manager.inData;
+
+	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+
+	//HOPGD
+	input.error=0.00001;
+	input.nModesMax=200;
+
+	//Creating modes
+
+	start = omp_get_wtime();
+//	std::cout<<"HOPGD: ";
+//	CreateModes modesCreator(input);
+//	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+//	std::cout<<"#modes = "<<modesCreator.model.nbrModes<<std::endl;
+//	fm.saveModel(outFolder, modesCreator.model);
+
+
+
+	start = omp_get_wtime();
+	std::cout<<"HOPGD3: ";
+	std::cout<<inData.param1DegreOfFreedom<<" "<<inData.spaceDegreOfFreedom<<endl;
+	NinputData3 input3(inData);
+	input3.error=input.error;
+	input3.nModesMax=input.nModesMax;
+	CreateModes modesCreator3(input3);
+	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+	std::cout<<"#modes = "<<modesCreator3.model.nbrModes<<std::endl;
+	fm.saveModel(outFolder, modesCreator3.model);
+
+	//Validation
+	//	validation(valJobsFolder,outFolder,modesCreator, input.nModesMax);
+	//	outFolder="/home/ikriuchevs/workspace/melted/tests/369/testsCpp/ND/";
+//	TESTconstNumberOfmodes(input.nModesMax,snapshots_dir,valJobsFolder,outFolder2,false);
+
+	cout<<"\nFinish!"<<endl;
+	return(0);
+
+}
+int main(int argc, char * argv[])
+{
+	int dim=5;
+	intVector sizes(dim-2,0);
+	//Reverse direction:(
+	sizes[0]=3; //Temperature
+	sizes[1]=3; //Specific heat
+	sizes[2]=2; //Density
+	string folder="/home/ikriuchevs/workspace/melted/tests/Ndim/Jobs/";
+	FileManager file_manager;
+	NinputData3 ndata;
+	double start = omp_get_wtime();
+	std::cout<<"Reading Files: ";
+
+	file_manager.readFolder(folder,ndata,dim,sizes);
+	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+	ndata.error=0.001;
+	ndata.nModesMax=20;
+
+	std::cout<<"Creating modes: ";
+	CreateModes modesCreator3(ndata);
+	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+
+//	NModel nm;
+//	nm.params=ndata.params;
+//	file_manager.saveModel(folder, nm);
+	std::cout<<"Saving the model: ";
+	file_manager.saveModel(folder, modesCreator3.nmodel);
+	cout<<"\nFinish!"<<endl;
+	Vector newParam(3,0);
+	newParam[0]=50;
+	newParam[1]=8000;
+	newParam[2]=8000;
+
+	Matrix M;
+	modesCreator3.fitNewND(newParam, M);
+	double err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(ndata.A.m_values[13])));
+
+	cout<<"error: "<<err<<endl;
+	return(0);
+}
+
+
+//Boost multi array index access test
+//---------------------------------------------------
+
+
+#include "mymatrix2.h"
+
+tIndex getIndex2(const tArray& m, const tValue* requestedElement, const unsigned short int direction)
+{
+	int offset = requestedElement - m.origin();
+	return(offset / m.strides()[direction] % m.shape()[direction] +  m.index_bases()[direction]);
+}
+//---------------------------------------------------------------------------------------------------
+
+tIndexArray getIndexArray2( const tArray& m, const tValue* requestedElement )
+{
+	tIndexArray _index;
+	for ( unsigned int dir = 0; dir < DIM; dir++ )
+	{
+		_index[dir] = getIndex2( m, requestedElement, dir );
+	}
+
+	return _index;
+}
+
+//#include <math.h>
+int main22()
+{
+
+	//BOOST multi_array
+	//-------------------------------------------------
+	boost::array<tArray::index, DIM> sizes;
+	sizes[0]=369;
+	sizes[1]=100;
+	sizes[2]=8;
+
+
+	unsigned int dataSize=1;
+	for(int i;i<DIM;++i)
+		dataSize*=sizes[i];
+	double* exampleData = new double[dataSize];
+	for ( int i = 0; i < dataSize; i++ ) { exampleData[i] = i; }
+
+	//boost::array<int, 2> a
+
+	tArray A(sizes);
+
+
+	A.assign(exampleData,exampleData+dataSize);
+
+	tValue* p = A.data();
+	tIndexArray index;
+	int imax=A.num_elements();
+	double start = omp_get_wtime();
+	for ( int i = 0; i <imax; ++i )
+	{
+		//		*p=22;
+		index = getIndexArray2( A, p );
+		//		std::cout << index[0] << " " << index[1] << " " << index[2] << " value = " << A(index) << "  check = " << *p << std::endl;
+		++p;
+	}
+	cout<<"time: "<<omp_get_wtime()-start<<endl;
+	//-------------------------------------------------
+	//MyMatrix
+	intVector ssizes(DIM);
+	intVector idx(DIM);
+	ssizes[0]=sizes[0];
+	ssizes[1]=sizes[1];
+	ssizes[2]=sizes[2];
+	myMatrix M(DIM, ssizes);
+	int i=0;
+	while(!M.ifEndPosition())
+	{
+		M.setNext(exampleData[i]);
+		i++;
+	}
+	M.resetCurrentPosition();
+	start = omp_get_wtime();
+	while(!M.ifEndPosition())
+	{
+		M.getCurrentIdx(idx);
+		//		std::cout << idx[0] << " " << idx[1] << " " << idx[2] << " value = " << std::endl;
+
+		M.next();
+	}
+	cout<<"time: "<<omp_get_wtime()-start<<endl;
+	//-------------------------------------------------
+	//MyMatrix2
+
+	myMatrix2 M2(DIM, ssizes);
+	i=0;
+	while(!M2.ifEndPosition())
+	{
+		M2.setNext(exampleData[i]);
+		i++;
+	}
+	M2.resetCurrentPosition();
+
+	start = omp_get_wtime();
+	while(!M2.ifEndPosition())
+	{
+		//		M2.getCurrentIdx(idx);
+		M2.getCurrentIdx(index);
+		//		std::cout << idx[0] << " " << idx[1] << " " << idx[2] << " value = "<<*M2.mmm_current_position  << std::endl;
+
+		M2.next();
+	}
+	cout<<"time: "<<omp_get_wtime()-start<<endl;
+
+	return 0;
+}
+
+
 

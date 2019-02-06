@@ -13,7 +13,7 @@ const double c_ebr=0.000001;
 
 const int c_vmax=500;
 
-
+//---------------------------------------------------------------------------------------------------
 //vector p must be sorted
 int searchUpperNearest(const Vector& p,double v)
 {
@@ -25,9 +25,462 @@ int searchUpperNearest(const Vector& p,double v)
 	return p.size();
 
 }
+//---------------------------------------------------------------------------------------------------
+
+void CreateModes::HOPGD( const myMatrix3& M, double ec)
+{
+//	const int c_nmax=100;
+	double start,fin;
+//	start = omp_get_wtime();
+	const double eBc=0.000001;
+	const int vmax=200;
+	intVector sizes=M.sizes();
+	int dim=M.dimensionality();
+
+	NModel model(dim);
+	myMatrix3 fna(dim, sizes);
+	myMatrix3 f(dim, sizes);
+	myMatrix3 R=M;
+	Vector *F;
+	F=new Vector[dim];
+//	std::cout<< "Prep time: "<<omp_get_wtime()-start<<std::endl;
+	double findFtime=0;
+	double findFnorm=0;
+	for (int n=0;n<c_nmax;++n)
+	{
+		double normBF=1;
+		double prevNorm=1;
+
+		double start,fin;
+		std::cout<<n<<"\n";
+//		start = omp_get_wtime();
+
+		if(R.dist(M) < ec )
+		{
+			std::cout<<"!!!!CONGRATULATIONS!!!!!\n";
+			break;
+		}
+
+		Vector bta1=Vector(dim,0);
+		Vector br1=Vector(dim,1);
+		Vector bt1=Vector(dim,0);
+
+		for(int d =0;d<dim;d++)
+		{
+			F[d]=Vector(sizes[d],1); //Must come from M or model
+			normBF*=blaze::sqrNorm(F[d]);
+
+		}
+
+		for (int v=0;v<vmax;++v)
+		{
+			bool e1=true;
+
+//			start = omp_get_wtime();
+			for(int m=0;m<dim;++m)
+			{
+
+				double currNorm=blaze::sqrNorm(F[m]);
+				normBF/=currNorm;
+				normBF*=prevNorm;
+				findF(m,R,F);
+				F[m]=F[m]/normBF;
+
+				bt1[m]=blaze::norm(F[m]);
+				prevNorm=bt1[m]*bt1[m];
+//				std::cout<<(trans(F[m])*F[m])<<"  "<<bt1[m]<<std::endl;
+				if(v==0)
+				{
+					br1[m]=bt1[m];
+				}
+
+				e1=e1&&((bt1[m]-bta1[m])/br1[m]<eBc);
+			}
+//			fin = omp_get_wtime();
+//			findFtime=findFtime+fin-start;
+			if(e1)
+			{
+				findApprox( f, F);
+
+				R=R-f;
+//				fna=fna+f;
+
+
+				//Store n-mode functions in NModel structure
+				for(int m=0;m<dim;++m)
+				{
+					model.F[m].resize(F[m].size(), model.nbrModes+1);
+					column(model.F[m],model.nbrModes)=F[m];
+				}
+				model.nbrModes++;
+
+
+				break;
+			}
+			else
+			{
+				bta1=bt1;
+			}
+
+		}
+
+
+	}
+	delete[] F;
+//	std::cout<<"findFtime: "<<findFtime<<std::endl;
+//	std::cout<<"findFnorm: "<<findFnorm<<std::endl;
+	nmodel=model;
+
+}
+//---------------------------------------------------------------------------------------------------
+void CreateModes::HOPGD( const myMatrix& M, double ec)
+{
+
+	double start,fin;
+//	start = omp_get_wtime();
+	const double eBc=0.000001;
+	const int vmax=200;
+	intVector sizes=M.sizes();
+	int dim=M.dimensionality();
+	std::cout<<dim<<"\n";
+	NModel model(dim);
+	myMatrix fna(dim, sizes);
+	myMatrix f(dim, sizes);
+	myMatrix R=M;
+	Vector *F;
+	F=new Vector[dim];
+//	std::cout<< "Prep time: "<<omp_get_wtime()-start<<std::endl;
+	double findFtime=0;
+	double findFnorm=0;
+
+	for (int n=0;n<c_nmax;++n)
+	{
+		double normBF=1;
+		double prevNorm=1;
+
+		double start,fin;
+		std::cout<<n<<"\n";
+//		start = omp_get_wtime();
+
+		if(R.dist(M) < ec )
+		{
+//			std::cout<<"!!!!CONGRATULATIONS!!!!!\n";
+			break;
+		}
+//		fin = omp_get_wtime();
+//		findFnorm=findFnorm+fin-start;
+		//Initialial values
+		Vector bta1=Vector(dim,0);
+		Vector br1=Vector(dim,1);
+		Vector bt1=Vector(dim,0);
+
+		for(int d =0;d<dim;d++)
+		{
+			F[d]=Vector(sizes[d],1); //Must come from M or model
+			normBF*=blaze::sqrNorm(F[d]);
+
+		}
+
+		for (int v=0;v<vmax;++v)
+		{
+			bool e1=true;
+
+//			start = omp_get_wtime();
+			for(int m=0;m<dim;++m)
+			{
+
+				double currNorm=blaze::sqrNorm(F[m]);
+				normBF/=currNorm;
+				normBF*=prevNorm;
+				findF(m,R,F);
+				F[m]=F[m]/normBF;
+
+				bt1[m]=blaze::norm(F[m]);
+				prevNorm=bt1[m]*bt1[m];
+//				std::cout<<(trans(F[m])*F[m])<<"  "<<bt1[m]<<std::endl;
+				if(v==0)
+				{
+					br1[m]=bt1[m];
+				}
+
+				e1=e1&&((bt1[m]-bta1[m])/br1[m]<eBc);
+			}
+//			fin = omp_get_wtime();
+//			findFtime=findFtime+fin-start;
+			if(e1)
+			{
+				findApprox( f, F);
+
+				R=R-f;
+//				fna=fna+f;
+
+
+				//Store n-mode functions in NModel structure
+				for(int m=0;m<dim;++m)
+				{
+					model.F[m].resize(F[m].size(), model.nbrModes+1);
+					column(model.F[m],model.nbrModes)=F[m];
+				}
+				model.nbrModes++;
+
+
+				break;
+			}
+			else
+			{
+				bta1=bt1;
+			}
+
+		}
+
+
+	}
+	delete[] F;
+//	std::cout<<"findFtime: "<<findFtime<<std::endl;
+//	std::cout<<"findFnorm: "<<findFnorm<<std::endl;
+	nmodel=model;
+
+}
+
+//---------------------------------------------------------------------------------------------------
+#ifndef NOindexArray
+void CreateModes::findF(const int& dimId, myMatrix& R, Vector* F)
+{
+//	R.resetCurrentPosition();
+	F[dimId]=Vector(F[dimId].size(),1);
+	Vector newF=Vector(F[dimId].size(),0);
+	int dim=R.dimensionality();
+	intVector idx(dim,0);
+
+	int imax=R.m_totSize;
+
+	for(int i=0;i <imax;++i)
+	{
+		double fMult=1;
+
+		double r=R.getElement(i);
+		idx=R.m_index[i];
+		for(int d=0;d<dim;d++)
+			fMult*=F[d][idx[d]];
+		newF[idx[dimId]]+=r*fMult;
+	}
+	F[dimId]=newF;
+
+
+
+}
+#else
+void CreateModes::findF(const int& dimId, myMatrix& R, Vector* F)
+{
+	R.resetCurrentPosition();
+	F[dimId]=Vector(F[dimId].size(),1);
+	Vector newF=Vector(F[dimId].size(),0);
+	int dim=R.dimensionality();
+	intVector idx(dim,0);
+	double fMult;
+	while(!R.ifEndPosition())
+//	while(R.ifNotEndPosition())
+	{
+		fMult=1;
+
+		R.getCurrentIdx(idx);
+
+//		for(int d=0;d<dim;d++)
+//			fMult*=F[d][idx[d]];
+
+		for(int d=0;d<dimId;++d)
+			fMult*=F[d][idx[d]];
+		for(int d=dimId+1;d<dim;++d)
+			fMult*=F[d][idx[d]];
+		newF[idx[dimId]]+=R.getCurrentVal()*fMult;
+		R.next();
+	}
+	F[dimId]=newF;
+}
+
+
+#endif
 
 //---------------------------------------------------------------------------------------------------
 
+void CreateModes::findApprox( myMatrix& R, Vector* F)
+{
+
+	int dim=R.dimensionality();
+	intVector idx(dim,0);
+	R.resetCurrentPosition();
+	while(!R.ifEndPosition())
+	{
+		R.getCurrentIdx(idx);
+		double fMult=1;
+		for(int d=0;d<dim;d++)
+			fMult*=F[d][idx[d]];
+		R.setNext(fMult);
+	}
+
+}
+//---------------------------------------------------------------------------------------------------
+
+
+void CreateModes::findF(const int& dimId, myMatrix3& R, Vector* F)
+{
+	R.resetCurrentPosition();
+	F[dimId]=Vector(F[dimId].size(),1);
+	Vector newF=Vector(F[dimId].size(),0);
+	int dim=R.dimensionality();
+	intVector idx(dim,0);
+	double fMult;
+
+	if(dimId ==0) //0 or 1 (space/time, or 2 max size dimensions)
+	{
+		for(int k=0;k<R.m_paramSize;++k)
+		{
+			R.getCurrentIdx(idx);
+			fMult=1;
+			for(int d=2;d<dim;++d)
+			{
+				fMult*=F[d][idx[d]];
+			}
+			newF+=R.m_values[k]*F[1]*fMult;
+			R.next();
+		}
+		//		newF[idx[dimId]]+=(trans(F[0])*R.m_values[k]*F[1])*fMult;
+	}
+	else if(dimId==1)
+	{
+		for(int k=0;k<R.m_paramSize;++k)
+		{
+			R.getCurrentIdx(idx);
+			fMult=1;
+			for(int d=2;d<dim;++d)
+			{
+				fMult*=F[d][idx[d]];
+			}
+			newF+=trans(R.m_values[k])*F[0]*fMult;
+			R.next();
+		}
+
+	}
+	else
+	{
+		for(int k=0;k<R.m_paramSize;++k)
+		{
+			R.getCurrentIdx(idx);
+			fMult=1;
+			for(int d=2;d<dim;++d)
+				fMult*=F[d][idx[d]];
+			newF[idx[dimId]]+=(trans(F[0])*R.m_values[k]*F[1])*fMult;
+			R.next();
+		}
+	}
+
+	double normBF=1;
+//	for(int d =0;d<dim;d++)
+//	{
+//		if(d!=dimId)
+//		normBF*=blaze::sqrNorm(F[d]);
+//
+//	}
+	F[dimId]=newF/normBF;
+}
+//---------------------------------------------------------------------------------------------------
+void CreateModes::findApprox( myMatrix3& R, Vector* F)
+{
+
+	int dim=R.dimensionality();
+	intVector idx(dim,0);
+	R.resetCurrentPosition();
+	Matrix M(R.sizes()[0],R.sizes()[1]);
+	for(int k=0;k<R.m_paramSize;++k)
+	{
+
+		R.getCurrentIdx(idx);
+		double fMult=1;
+		for(int d=2;d<dim;d++)
+			fMult*=F[d][idx[d]];
+		M=F[0]*fMult*trans(F[1]);
+		R.setNext(M);
+	}
+
+}
+////---------------------------------------------------------------------------------------------------
+
+//void CreateModes::findF(int dimId, myMatrix& R, Vector* F)
+//{
+//	F[dimId]=Vector(F[dimId].size(),1);
+//	Vector temp=R.m_values;
+//	Vector newF=Vector(F[dimId].size(),0);
+//	int dim=R.dimensionality();
+//
+//	intVector cum_sizes(dim+1,0);
+//	cum_sizes[0]=1;
+//	for(int d=0;d<dim;++d)
+//	{
+//		cum_sizes[d+1]=cum_sizes[d]*R.m_sizes[d];
+//
+//	}
+//	for(int d=0;d<dim;d++)
+//	{
+//		for(int j=0; j<R.m_totSize/cum_sizes[d+1];++j)
+//		{
+//			for (int f =0;f<F[d].size();++f)
+//			{
+//				auto sv2 = subvector( temp, j*cum_sizes[d+1], cum_sizes[d] );
+//				sv2=sv2*F[d][f];
+//			}
+//		}
+//
+//	}
+//	for(int j=0; j<R.m_totSize/cum_sizes[dimId+1];++j)
+//	{
+//		for (int f =0;f<F[dimId].size();++f)
+//		{
+//			auto sv2 = subvector( temp, j*cum_sizes[dimId+1], cum_sizes[dimId] );
+//			newF[f]+=blaze::sum(sv2);
+//		}
+//	}
+//	double ssss=blaze::sum(temp);
+//
+//	double normBF=1;
+//	for(int d=0;d<dim;d++)
+//	{
+//		if (d!=dimId)
+//			normBF*=(trans(F[d])*F[d]);
+//	}
+//	F[dimId]=newF/normBF;
+//
+//}
+//---------------------------------------------------------------------------------------------------
+CreateModes::CreateModes(const NinputData& input):c_nmax(input.nModesMax)
+{
+	HOPGD( input.A,input.error);
+	nmodel.params=input.params;
+	if(nmodel.dim==3)
+	{
+		model.nbrModes=nmodel.nbrModes;
+		model.F1.resize(nmodel.F[0].rows(),nmodel.F[0].columns());
+		model.F1=nmodel.F[0];
+		model.F2=nmodel.F[1];
+		model.F3=nmodel.F[2];
+		model.param1=input.params[0];
+	}
+}
+//---------------------------------------------------------------------------------------------------
+CreateModes::CreateModes(const NinputData3& input):c_nmax(input.nModesMax)
+{
+	HOPGD( input.A,input.error);
+	nmodel.params=input.params;
+	if(nmodel.dim==3)
+	{
+		model.nbrModes=nmodel.nbrModes;
+		model.F1.resize(nmodel.F[0].rows(),nmodel.F[0].columns());
+		model.F1=nmodel.F[0];
+		model.F2=nmodel.F[1];
+		model.F3=nmodel.F[2];
+		model.param1=input.params[0];
+	}
+}
+//---------------------------------------------------------------------------------------------------
 CreateModes::CreateModes(const inputData& inData,int nmax):c_nmax(nmax)
 {
 	model.nbrModes=0;
@@ -226,6 +679,58 @@ void CreateModes::fitNew_Loops(const double& newParam1, Matrix& result) const
 
 }
 
+//---------------------------------------------------------------------------------------------------
+void CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
+{
+	if(nmodel.dim==3)
+	{
+		fitNew(newParam1[0], result);
+	}
+	else
+	{
+		Vector Vinter(nmodel.nbrModes,1);
+		for(int d=2;d<nmodel.dim;++d)
+		{
+			int idx=searchUpperNearest(nmodel.params[d-2],newParam1[d-2]);
+			//	std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
+			if( idx >= 0 && idx < nmodel.params[d-2].size())
+			{
+				int idxlow=idx==0?idx:idx-1;
+				Vector low=column(trans(nmodel.F[d]),idxlow);
+				Vector up=column(trans(nmodel.F[d]),idx);
+
+				Vector Vinter2;
+				if(idx ==0 && newParam1==model.param1[idx])
+				{
+					Vinter2=low;
+				}
+				else
+				{
+
+
+					Vinter2=low+(up-low)*(1.0/(nmodel.params[d-2][idx]-nmodel.params[d-2][idx-1])*(newParam1[d-2]-nmodel.params[d-2][idx-1]));
+				}
+				Vinter=Vinter*Vinter2;
+			}
+			else
+			{
+				std::cout<<"Enrichment is needed\n";
+			}
+		}
+		result.resize(nmodel.F[0].rows(),nmodel.F[1].rows(),false);
+		result=0;
+		Matrix result2=result;
+		Matrix F1temp=nmodel.F[1];
+
+		for(uint mode=0;mode<nmodel.nbrModes;++mode)
+		{
+			double temp=Vinter[mode];
+			column(F1temp,mode)=temp*column(F1temp,mode);
+		}
+		result=nmodel.F[0]*trans(F1temp);
+
+	}
+}
 //---------------------------------------------------------------------------------------------------
 
 void CreateModes::fitNew(const double& newParam1, Matrix& result) const
