@@ -39,7 +39,9 @@ public:
 	void write(string filename, const Matrix& m);
 	void saveModel(string dirPath, const Model& model);
 	void saveModel(string dirPath, const NModel& model);
+
 	bool loadModel(string dirPath, Model& model);
+	bool loadModel(string dirPath, NModel& model);
 
 	inputData inData;
 //  Old read from txt files

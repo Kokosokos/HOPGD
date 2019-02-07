@@ -33,12 +33,12 @@ void CreateModes::HOPGD( const myMatrix3& M, double ec)
 	double start,fin;
 //	start = omp_get_wtime();
 	const double eBc=0.000001;
-	const int vmax=200;
+	const int vmax=2400;
 	intVector sizes=M.sizes();
 	int dim=M.dimensionality();
 
 	NModel model(dim);
-	myMatrix3 fna(dim, sizes);
+//	myMatrix3 fna(dim, sizes);
 	myMatrix3 f(dim, sizes);
 	myMatrix3 R=M;
 	Vector *F;
@@ -52,7 +52,9 @@ void CreateModes::HOPGD( const myMatrix3& M, double ec)
 		double prevNorm=1;
 
 		double start,fin;
-		std::cout<<n<<"\n";
+		std::cout<<"\n";
+		std::cout<<n<<": v: ";
+		std::cout.flush();
 //		start = omp_get_wtime();
 
 		if(R.dist(M) < ec )
@@ -74,6 +76,8 @@ void CreateModes::HOPGD( const myMatrix3& M, double ec)
 
 		for (int v=0;v<vmax;++v)
 		{
+			std::cout<<v<<" ";
+			std::cout.flush();
 			bool e1=true;
 
 //			start = omp_get_wtime();
@@ -692,7 +696,6 @@ void CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
 		for(int d=2;d<nmodel.dim;++d)
 		{
 			int idx=searchUpperNearest(nmodel.params[d-2],newParam1[d-2]);
-			//	std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
 			if( idx >= 0 && idx < nmodel.params[d-2].size())
 			{
 				int idxlow=idx==0?idx:idx-1;
@@ -700,7 +703,7 @@ void CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
 				Vector up=column(trans(nmodel.F[d]),idx);
 
 				Vector Vinter2;
-				if(idx ==0 && newParam1==model.param1[idx])
+				if(idx ==0 && newParam1==nmodel.params[d-2][idx])
 				{
 					Vinter2=low;
 				}
@@ -728,6 +731,61 @@ void CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
 			column(F1temp,mode)=temp*column(F1temp,mode);
 		}
 		result=nmodel.F[0]*trans(F1temp);
+
+	}
+}
+void CreateModes::fitNewND2(const Vector& newParam1, Matrix& result) const
+{
+	if(nmodel.dim==3)
+	{
+		fitNew(newParam1[0], result);
+	}
+	else
+	{
+		Vector Vinter(nmodel.nbrModes,1);
+		for(int d=2;d<nmodel.dim;++d)
+		{
+			int idx=searchUpperNearest(nmodel.params[d-2],newParam1[d-2]);
+			if( idx >= 0 && idx < nmodel.params[d-2].size())
+			{
+				int idxlow=idx==0?idx:idx-1;
+				Vector low=column(trans(nmodel.F[d]),idxlow);
+				Vector up=column(trans(nmodel.F[d]),idx);
+
+				Vector Vinter2;
+				if(idx ==0 && newParam1==nmodel.params[d-2][idx])
+				{
+					Vinter2=low;
+				}
+				else
+				{
+
+
+					Vinter2=low+(up-low)*(1.0/(nmodel.params[d-2][idx]-nmodel.params[d-2][idx-1])*(newParam1[d-2]-nmodel.params[d-2][idx-1]));
+				}
+				Vinter=Vinter*Vinter2;
+			}
+			else
+			{
+				std::cout<<"Enrichment is needed\n";
+			}
+		}
+		result.resize(nmodel.F[0].rows(),nmodel.F[1].rows(),false);
+		result=0;
+		Matrix result2=result;
+		Matrix F1temp=nmodel.F[1];
+
+//		for(uint mode=0;mode<nmodel.nbrModes;++mode)
+//		{
+//			double temp=Vinter[mode];
+//			column(F1temp,mode)=temp*column(F1temp,mode);
+//		}
+		result=nmodel.F[0]*trans(nmodel.F[1]);
+		for(uint mode=0;mode<nmodel.nbrModes;++mode)
+		{
+			double temp=Vinter[mode];
+			column(result,mode)=temp*column(result,mode);
+		}
 
 	}
 }

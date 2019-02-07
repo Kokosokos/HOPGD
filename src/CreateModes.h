@@ -30,6 +30,8 @@ public:
 
 	//using blaze matrix multiplication
 	void fitNewND(const Vector& newParam1, Matrix& result) const;
+	void fitNewND2(const Vector& newParam1, Matrix& result) const;
+
 	void fitNew(const double& newParam1, Matrix& result) const;
 	void fitNew(const double& newParam1, Matrix& result, int nModes) const;
 

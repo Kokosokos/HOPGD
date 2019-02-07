@@ -43,6 +43,7 @@ void validation(string valJobsFolder,string outFolderName,const CreateModes& mod
 	string outFileName= outFolderName+"nmax."+std::to_string(nModes)+".omp8.dat";
 	std::cout<<outFolderName<<std::endl;
 	FILE * outFile;
+
 	std::cout<<"Reading validation files: ";
 	outFile = fopen(outFileName.c_str(), "w");
 
@@ -56,6 +57,7 @@ void validation(string valJobsFolder,string outFolderName,const CreateModes& mod
 	start = omp_get_wtime();
 	fprintf (outFile, "#nbr of modes = %d\n", nModes);
 	fprintf (outFile, "#value error time\n");
+
 	for (int val_idx =0;val_idx<validation_files.inData.param1DegreOfFreedom;++val_idx)
 	{
 		//		start = std::clock();
@@ -69,6 +71,7 @@ void validation(string valJobsFolder,string outFolderName,const CreateModes& mod
 		//		fprintf (outFile, "%.1f %f %f\n", validation_files.inData.param1[val_idx], err,( fin - start ) / (double) CLOCKS_PER_SEC);
 		fprintf (outFile, "%.1f %f %lf\n", validation_files.inData.param1[val_idx], err,( fin - start ) );
 	}
+
 	fclose (outFile);
 }
 void validation(string valJobsFolder,string outFolderName,const CreateModes& modesCreator)
@@ -768,157 +771,134 @@ int main234(int argc, char * argv[])
 }
 int main(int argc, char * argv[])
 {
-	int dim=5;
-	intVector sizes(dim-2,0);
-	//Reverse direction:(
-	sizes[0]=3; //Temperature
-	sizes[1]=3; //Specific heat
-	sizes[2]=2; //Density
-	string folder="/home/ikriuchevs/workspace/melted/tests/Ndim/Jobs/";
+	odb_initializeAPI();
+
+	int dim=6;
+	int nthreads=8;
 	FileManager file_manager;
 	NinputData3 ndata;
+	intVector sizes(dim-2,0);
+	//Small test
+//	std::cout<<"Small TEST 1-18: ";
+//	//Reverse direction:(
+//	sizes[0]=3; //Temperature
+//	sizes[1]=3; //Specific heat
+//	sizes[2]=2; //Density
+//	sizes[3]=1; //Density
+//	string folder="/home/ikriuchevs/workspace/melted/tests/Ndim/Jobs/";
+//	string outfolder="/home/ikriuchevs/workspace/melted/tests/Ndim/Jobs/118model/";
+//
+//	double start = omp_get_wtime();
+//	std::cout<<"Reading Files: ";
+//
+//	file_manager.readFolder(folder,ndata,dim,sizes);
+//	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+//	ndata.error=0.001;
+//	ndata.nModesMax=20;
+//
+//	std::cout<<"Creating modes: ";
+//	CreateModes modesCreator2(ndata);
+//	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+//
+//	std::cout<<"Saving the model: \n";
+//	file_manager.saveModel(outfolder, modesCreator2.nmodel);
+
+
+
+	//lARGE test
+//	std::cout<<"Small TEST 1-81: ";
+//	sizes[0]=3; //Temperature
+//	sizes[1]=3; //Specific heat
+//	sizes[2]=3; //Density
+//	sizes[3]=3; //Density
+//
+//	string folder="/home/ikriuchevs/workspace/melted/tests/Ndim/Jobs/";
+//	string outfolder="/home/ikriuchevs/workspace/melted/tests/Ndim/Jobs/181model/";
+//
+//	double start = omp_get_wtime();
+//	std::cout<<"Reading Files: ";
+//
+//	file_manager.readFolder(folder,ndata,dim,sizes);
+//	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+//	ndata.error=0.001;
+//	ndata.nModesMax=20;
+//
+//	std::cout<<"Creating modes: ";
+//	CreateModes modesCreator3(ndata);
+//	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+//
+//	std::cout<<"Saving the model: \n";
+//	file_manager.saveModel(outfolder, modesCreator3.nmodel);
+
+	string outfolder="/home/ikriuchevs/workspace/melted/tests/Ndim/Jobs/181model/";
+	CreateModes modesCreator3;
+	file_manager.loadModel(outfolder, modesCreator3.nmodel);
+	cout<<modesCreator3.nmodel.F[0].rows()<<" "<<modesCreator3.nmodel.F[1].rows()<<endl;
+	string folder="/home/ikriuchevs/workspace/melted/tests/Ndim/Validation/";
+	Matrix M(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows());
+	Matrix Mfit(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows());
+
+//	cout<<modesCreator3.nmodel.params[0]<<endl;
+//	cout<<modesCreator3.nmodel.F[1]<<endl;
+//	cout<<modesCreator3.nmodel.F[1]<<endl;
 	double start = omp_get_wtime();
-	std::cout<<"Reading Files: ";
+	double fin;
 
-	file_manager.readFolder(folder,ndata,dim,sizes);
-	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
-	ndata.error=0.001;
-	ndata.nModesMax=20;
+	FILE * outFile;
+	string outFileName=folder+"/nmax"+std::to_string( modesCreator3.nmodel.nbrModes)+".omp"+std::to_string(nthreads)+".dat";
+	outFile = fopen(outFileName.c_str(), "w");
+	fprintf (outFile, "#nbr of modes = %d\n",modesCreator3.nmodel.nbrModes);
+	fprintf (outFile, "#value error time\n");
+	blaze::setNumThreads( nthreads );
+	for(int i=1;i<=8;++i)
+	{
+		string filename=folder+std::to_string(i)+"/just.odb";
+		cout<<filename<<endl;
+		file_manager.readODB2(filename, M);
 
-	std::cout<<"Creating modes: ";
-	CreateModes modesCreator3(ndata);
-	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
+		string paramname=folder+std::to_string(i)+"/params.dat";
+//		cout<<paramname<<endl;
+		std::ifstream inFile;
+		inFile.open(paramname, std::ios_base::in);
+		double temp=0;
+		Vector param(dim-2,0);
+		for(int d=0;d<dim-2;++d)
+		{
+			inFile>>temp;
+			if(d>=0)
+			{
+				param[dim-1-2-(d)]=temp;
 
-//	NModel nm;
-//	nm.params=ndata.params;
-//	file_manager.saveModel(folder, nm);
-	std::cout<<"Saving the model: ";
-	file_manager.saveModel(folder, modesCreator3.nmodel);
-	cout<<"\nFinish!"<<endl;
-	Vector newParam(3,0);
-	newParam[0]=50;
-	newParam[1]=8000;
-	newParam[2]=8000;
+				std::cout<<temp<<" ";
+			}
+		}
 
-	Matrix M;
-	modesCreator3.fitNewND(newParam, M);
-	double err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(ndata.A.m_values[13])));
+		inFile.close();
+		start = omp_get_wtime();
+		modesCreator3.fitNewND2(param,Mfit);
+		fin=omp_get_wtime()-start;
 
-	cout<<"error: "<<err<<endl;
+		double err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
+
+		cout<<" error: "<<err<<"%; time = "<<fin<<" sec"<<endl;
+
+		fprintf (outFile, "%d %f %lf\n", i, err, fin );
+
+
+	}
+	fclose (outFile);
+
+	sizes[0]=8; //Temperature
+	sizes[1]=1; //Specific heat
+	sizes[2]=1; //Density
+	sizes[3]=1; //Density
+
+
+	odb_finalizeAPI();
+
 	return(0);
 }
 
-
-//Boost multi array index access test
-//---------------------------------------------------
-
-
-#include "mymatrix2.h"
-
-tIndex getIndex2(const tArray& m, const tValue* requestedElement, const unsigned short int direction)
-{
-	int offset = requestedElement - m.origin();
-	return(offset / m.strides()[direction] % m.shape()[direction] +  m.index_bases()[direction]);
-}
-//---------------------------------------------------------------------------------------------------
-
-tIndexArray getIndexArray2( const tArray& m, const tValue* requestedElement )
-{
-	tIndexArray _index;
-	for ( unsigned int dir = 0; dir < DIM; dir++ )
-	{
-		_index[dir] = getIndex2( m, requestedElement, dir );
-	}
-
-	return _index;
-}
-
-//#include <math.h>
-int main22()
-{
-
-	//BOOST multi_array
-	//-------------------------------------------------
-	boost::array<tArray::index, DIM> sizes;
-	sizes[0]=369;
-	sizes[1]=100;
-	sizes[2]=8;
-
-
-	unsigned int dataSize=1;
-	for(int i;i<DIM;++i)
-		dataSize*=sizes[i];
-	double* exampleData = new double[dataSize];
-	for ( int i = 0; i < dataSize; i++ ) { exampleData[i] = i; }
-
-	//boost::array<int, 2> a
-
-	tArray A(sizes);
-
-
-	A.assign(exampleData,exampleData+dataSize);
-
-	tValue* p = A.data();
-	tIndexArray index;
-	int imax=A.num_elements();
-	double start = omp_get_wtime();
-	for ( int i = 0; i <imax; ++i )
-	{
-		//		*p=22;
-		index = getIndexArray2( A, p );
-		//		std::cout << index[0] << " " << index[1] << " " << index[2] << " value = " << A(index) << "  check = " << *p << std::endl;
-		++p;
-	}
-	cout<<"time: "<<omp_get_wtime()-start<<endl;
-	//-------------------------------------------------
-	//MyMatrix
-	intVector ssizes(DIM);
-	intVector idx(DIM);
-	ssizes[0]=sizes[0];
-	ssizes[1]=sizes[1];
-	ssizes[2]=sizes[2];
-	myMatrix M(DIM, ssizes);
-	int i=0;
-	while(!M.ifEndPosition())
-	{
-		M.setNext(exampleData[i]);
-		i++;
-	}
-	M.resetCurrentPosition();
-	start = omp_get_wtime();
-	while(!M.ifEndPosition())
-	{
-		M.getCurrentIdx(idx);
-		//		std::cout << idx[0] << " " << idx[1] << " " << idx[2] << " value = " << std::endl;
-
-		M.next();
-	}
-	cout<<"time: "<<omp_get_wtime()-start<<endl;
-	//-------------------------------------------------
-	//MyMatrix2
-
-	myMatrix2 M2(DIM, ssizes);
-	i=0;
-	while(!M2.ifEndPosition())
-	{
-		M2.setNext(exampleData[i]);
-		i++;
-	}
-	M2.resetCurrentPosition();
-
-	start = omp_get_wtime();
-	while(!M2.ifEndPosition())
-	{
-		//		M2.getCurrentIdx(idx);
-		M2.getCurrentIdx(index);
-		//		std::cout << idx[0] << " " << idx[1] << " " << idx[2] << " value = "<<*M2.mmm_current_position  << std::endl;
-
-		M2.next();
-	}
-	cout<<"time: "<<omp_get_wtime()-start<<endl;
-
-	return 0;
-}
 
 
 

@@ -187,6 +187,8 @@ void FileManager::saveModel(string dirPath, const NModel& model)
 	outFile.open((dirPath+"model.dat").c_str(), std::ios_base::out);
 	outFile<<model.nbrModes<<" ";
 	outFile<<"\n";
+	outFile<<model.dim;
+	outFile<<"\n";
 	for (int d=0;d<model.F.size();++d)
 		outFile<<model.F[d].rows()<<" ";
 	outFile<<"\n";
@@ -201,6 +203,41 @@ void FileManager::saveModel(string dirPath, const NModel& model)
 	outFile.close();
 	for (int d=0;d<model.F.size();++d)
 		write(dirPath+"/F"+std::to_string(d)+".dat", model.F[d]);
+
+}
+//---------------------------------------------------------------------------------------------------
+
+bool FileManager::loadModel(string dirPath, NModel& model)
+{
+	std::ifstream inFile;
+	inFile.open((dirPath+"model.dat").c_str(), std::ios_base::in);
+	if (!inFile) {
+		std::cerr << "Unable to open file "+(dirPath+"model.dat");
+		return false;   // call system to stop
+	}
+	inFile>>model.nbrModes;
+	inFile>>model.dim;
+
+	intVector sizes(model.dim);
+//	F.resize(model.dim);
+	for (int d=0;d<model.dim;++d)
+	{
+		inFile>>sizes[d];
+		Matrix M(sizes[d],model.nbrModes,0);
+		model.F.push_back(M);
+	}
+
+	for (int d=2;d<model.dim;++d)
+	{
+		Vector v(sizes[d],0);
+		for (int j=0;j<sizes[d];++j)
+			inFile>>v[j];
+		model.params.push_back(v);
+	}
+	inFile.close();
+	for (int d=0;d<model.F.size();++d)
+		read(dirPath+"/F"+std::to_string(d)+".dat", model.F[d]);
+	return true;
 
 }
 //---------------------------------------------------------------------------------------------------
@@ -224,11 +261,9 @@ bool FileManager::loadModel(string dirPath, Model& model)
 
 	model.param1.resize(F3rows);
 	printf("%d\n",model.param1.size());
-	std::cout<<sizeof(model.param1[0])<<" ";
 	for (int i=0;i<F3rows;++i)
 	{
 		inFile >> model.param1[i];
-		std::cout<<model.param1[i]<<" ";
 	}
 	printf("\n");
 	inFile.close();
@@ -359,23 +394,20 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 	Ndata.A.resetCurrentPosition();
 	Matrix M(spaceDegreOfFreedom,timeDegreOfFreedom);
 
-	std::cout<<"chck1\n";
 	vector<Vector> allParams;
 	for (int k=1;k<Ndata.A.m_paramSize+1;++k)
 	{
 
 		string folder=foldername+"/"+std::to_string(k)+"/";
 		string fname=folder+"just.odb";
-		std::cout<<fname<<"\n";
 		readODB2(fname, M);
 		Ndata.A.setNext(M);
 		fname=folder+"params.dat";
 		std::ifstream inFile;
-
 		inFile.open(fname, std::ios_base::in);
 		double temp=0;
 		Vector param(dim-2,0);
-		std::cout<<"params: ";
+		std::cout<<"params: "<<k<<" ";
 //		for(int d=0;d<dim-2;++d)
 //		{
 //			inFile>>temp;
@@ -384,7 +416,7 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 //			std::cout<<temp<<" ";
 //		}
 		//TEMPORARY
-		for(int d=-1;d<dim-2;++d)
+		for(int d=0;d<dim-2;++d)
 		{
 			inFile>>temp;
 			if(d>=0)
@@ -395,37 +427,33 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 			}
 		}
 		allParams.push_back(param);
-
 		std::cout<<"\n";
 		inFile.close();
 
 	}
 //	std::reverse(allParams.begin(), allParams.end());
-
+	std::cout<<"1\n";
 	int jump=1;//Ndata.A.m_matrix_size;
-	std::cout<<"parameters: \n";
 	for(int d=2;d<dim;++d)
 	{
 		Vector v(Ndata.A.sizes()[d]);
 		for(int j=0;j<Ndata.A.sizes()[d];j++)
 		{
-			std::cout<<allParams[j*jump][dim-1-(d)]<<" ";
 			v[j]=allParams[j*jump][dim-1-(d)];
 		}
 		Ndata.params.push_back(v);
-		std::cout<<"\n"<<v<<std::endl;
 		jump*=Ndata.A.sizes()[d];
 	}
-	std::cout<<"\n";
 	//--------------------------------------------
 
-
+	std::cout<<"2\n";
 }
 //---------------------------------------------------------------------------------------------------
 
 void FileManager::readODB2(string filename, Matrix& m)
 {
-	odb_initializeAPI();
+
+//	odb_initializeAPI();
 
 	odb_Odb& myOdb = openOdb(filename.c_str(), true);
 
@@ -448,14 +476,13 @@ void FileManager::readODB2(string filename, Matrix& m)
 //	cout<<timeID<<endl;
 
 	}
-
 	myOdb.close();
-	odb_finalizeAPI();
+//	odb_finalizeAPI();
 }
 //---------------------------------------------------------------------------------------------------
 void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, int& timeDegreOfFreedom)
 {
-	odb_initializeAPI();
+//	odb_initializeAPI();
 //
 	odb_Odb& myOdb = openOdb(filename.c_str(), true);
 	odb_StepRepository& steps = myOdb.steps();
@@ -470,7 +497,7 @@ void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, 
 	int numValues = allFramesInStep[numFrames-1].fieldOutputs()["NT11"].values().size();
 	spaceDegreOfFreedom=numValues;
 	myOdb.close();
-	odb_finalizeAPI();
+//	odb_finalizeAPI();
 }
 
 //Appends data to myMatrix
