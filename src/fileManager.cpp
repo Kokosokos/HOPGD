@@ -13,16 +13,6 @@ using namespace boost::filesystem;
 //using std::string;
 typedef blaze::DynamicVector<string,blaze::rowMajor> SVector;
 const int c_tmax=100;
-//Stupid sorting folder names routine
-
-double my_stod (std::string const& s) {
-    std::istringstream iss (s);
-    iss.imbue (std::locale("C"));
-    double d;
-    iss >> d;
-    // insert error checking.
-    return d;
-}
 
 //---------------------------------------------------------------------------------------------------
 class sort_indices
@@ -50,8 +40,16 @@ void vectorSort2(Vector& p,SVector& s)
 	delete[] indices;
 
 }
+//---------------------------------------------------------------------------------------------------
 
-
+double my_stod (std::string const& s) {
+    std::istringstream iss (s);
+    iss.imbue (std::locale("C"));
+    double d;
+    iss >> d;
+    // insert error checking.
+    return d;
+}
 
 //---------------------------------------------------------------------------------------------------
 
@@ -88,29 +86,20 @@ void FileManager::readFolder(string foldername)
 	vectorSort2(inData.param1,sparam1);
 	//+++++++++++++++++++++++++++
 
-//	inData.timeDegreOfFreedom=nFiles;
-	//	std::cout << "\n";
 	inData.init();
 	k=0;
 	for (int k=0;k<inData.param1DegreOfFreedom;++k)
 	{
-		//		path file=it->path();
 		path file(folderBaseName+sparam1[k]);
 		Matrix m1p;//(inData.spaceDegreOfFreedom,inData.timeDegreOfFreedom);
 
 		string new_filename = file.generic_string() + string("/")+filenameString+sparam1[k]+string(".odb");
-//		std::cout<<sparam1[k]<<": "<<new_filename<<std::endl;
 		readODB(new_filename, m1p);
 		inData.A[k]=m1p;
 
 	}
-	//--------------------------------------------
-
 
 }
-
-
-
 //---------------------------------------------------------------------------------------------------
 void FileManager::read(string filename, Matrix& m)
 {
@@ -193,7 +182,6 @@ void FileManager::saveModel(string dirPath, const NModel& model)
 		outFile<<model.F[d].rows()<<" ";
 	outFile<<"\n";
 
-//	std::cout<<model.params.size()<<" "<<model.params[0].size()<<std::endl;
 	for (int i=0;i<model.params.size();++i)
 	{
 		for (int j=0;j<model.params[i].size();++j)
@@ -448,19 +436,11 @@ void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, 
 }
 
 
+//Old .txt based input <---toooooooooo SLOW (but leave it here just in case)
 //---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
+
+
+//
 
 //Add Warnings/Errors
 //if nFiles is different in folders
