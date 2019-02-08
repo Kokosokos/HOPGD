@@ -275,500 +275,9 @@ int main3(int argc, char * argv[])
 	return 0;
 }
 
+
 #include <odb_API.h>
 
-#include <sys/stat.h>
-using namespace std;
-/*
- ***************
-utility functions
- ***************
- */
-bool fileExists(const odb_String  &string);
-void rightTrim(odb_String  &string,const char* char_set);
-void printExecutionSummary();
-/***************************************************************/
-#include "odb_MaterialTypes.h"
-using namespace std;
-int main327532(int argc, char **argv)
-{
-
-
-	//  odb_String elsetName;
-	//  bool ifElset = false;
-	//  odb_Set myElset;
-	//  odb_String region = "over the entire model";
-	//  char msg[256];
-	//  char *abaCmd = argv[0];
-	odb_initializeAPI();
-	odb_String odbPath;
-	odbPath = "/home/ikriuchevs/workspace/melted/tests/Ndim/Jobs/1/just.odb";
-
-	bool ifOdbName = false;
-//	if (!fileExists(odbPath))
-//	{
-//		cerr << "**ERROR** output database  " << odbPath.CStr()
-//                    																										 << " does not exist\n" << endl;
-//		exit(1);
-//	}
-	ifOdbName = true;
-	cout<<"HEloo"<<endl;
-	//  for (int arg = 0; arg<argc; arg++)
-	//    {
-	//      if (strncmp(argv[arg],"-o**",2) == 0)
-	//        {
-	//          arg++;
-	//          odbPath = "tests/369/Snapshots/TxtOutFiles/conductivity_205.0/heatTransfer_Conductivity_205.0.odb";
-	//          rightTrim(odbPath,".odb");
-	//          if (!fileExists(odbPath))
-	//            {
-	//              cerr << "**ERROR** output database  " << odbPath.CStr()
-	//                   << " does not exist\n" << endl;
-	//              exit(1);
-	//            }
-	//          ifOdbName = true;
-	//        }
-	//      else if (strncmp(argv[arg],"-e**",2)== 0)
-	//        {
-	//          arg++;
-	//          elsetName = argv[arg];
-	//          ifElset = true;
-	//        }
-	//      else if (strncmp(argv[arg],"-h**",2)== 0)
-	//        {
-	//          printExecutionSummary();
-	//          exit(0);
-	//        }
-	//    }
-	//  if (ifOdbName)
-	//    {
-	//      cerr << "**ERROR** output database name is not provided\n";
-	//      printExecutionSummary();
-	//      exit(1);
-	//    }
-	// Open the output database
-
-	cout<<"Opening .odb"<<endl;
-
-	odb_Odb& myOdb = openOdb(odbPath, true);
-
-	odb_Material mymat;
-	//	odb_Odb& myOdb = Odb(odbPath);
-	cout<<"Accessing rootAssemly"<<endl;
-	odb_Assembly& myAssembly = myOdb.rootAssembly();
-	odb_InstanceRepositoryIT instIter(myAssembly.instances());
-	for (instIter.first(); !instIter.isDone(); instIter.next())
-		cout << instIter.currentKey().CStr() << endl;
-
-	cout << "Node set keys:" << endl;
-	odb_SetRepositoryIT setIter( myAssembly.nodeSets() );
-	for (setIter.first(); !setIter.isDone(); setIter.next())
-		cout << setIter.currentKey().CStr() << endl;
-
-	odb_InstanceRepository& iCon =
-			myOdb.rootAssembly().instances();
-	odb_Instance& instance = iCon["PART-1-1"];
-
-	odb_StepRepositoryIT stepIter( myOdb.steps() );
-	for (stepIter.first(); !stepIter.isDone();
-			stepIter.next())
-		cout << stepIter.currentKey().CStr() << endl;
-
-	odb_Step& step = myOdb.steps()["Step-1"];
-	odb_SequenceFrame& allFramesInStep = step.frames();
-	int numFrames = allFramesInStep.size();
-	odb_Frame& lastFrame = allFramesInStep[numFrames-1];
-
-	odb_FieldOutputRepository& fieldOutputRep =
-			lastFrame.fieldOutputs();
-	odb_FieldOutputRepositoryIT fieldIter( fieldOutputRep );
-	for (fieldIter.first(); !fieldIter.isDone(); fieldIter.next())
-		cout << fieldIter.currentKey().CStr() << endl;
-
-	for (fieldIter.first(); !fieldIter.isDone();
-			fieldIter.next()) {
-		odb_FieldOutput& field =
-				fieldOutputRep[fieldIter.currentKey()];
-		const odb_SequenceFieldValue& seqVal = field.values();
-		const odb_SequenceFieldLocation& seqLoc =
-				field.locations();
-		cout << field.name().CStr() << " : " << field.description().CStr()
-	        																						<< endl;
-		cout << "    Type: " << field.type() << endl;
-		int numLoc = seqLoc.size();
-		for (int loc = 0; loc<numLoc; loc++){
-			cout << "Position: "<<seqLoc.constGet(loc).position();
-		}
-		cout << endl;
-	}
-
-
-	//	    const odb_SequenceFieldValue& displacements =
-	//	    		lastFrame.fieldOutputs()["NT11"].values();
-
-	int timeID=0;
-//	const odb_SequenceFieldValue& displacements =
-//			allFramesInStep[timeID].fieldOutputs()["NT11"].values();
-//	int numValues = displacements.size();
-//	int numComp = 0;
-//	for (int i=0; i<numValues; i++) {
-//		const odb_FieldValue val = displacements[i];
-//		cout << "Node = " << val.nodeLabel();
-//		const float* const NT11 = val.data(numComp);
-//		cout << ", T = ";
-//		for (int comp=0;comp<numComp;comp++)
-//			cout << NT11[comp] << "  ";
-//		cout << endl;
-//	}
-
-	myOdb.close();
-	odb_finalizeAPI();
-
-	return(0);
-}
-
-//Ndimensional matrix test
-//searching for F[dimId], the rest F[i] i!=dimId are considered to be known
-//R-residuals matrix
-
-
-#include "mymatrix3.h"
-void findApprox( myMatrix3& R, Vector* F);
-void findF3(const int& dimId, myMatrix3& R, Vector* F);
-
-NModel HOPGD( const myMatrix3& M, double ec)
-{
-	const int c_nmax=100;
-	double start,fin;
-//	start = omp_get_wtime();
-	const double eBc=0.000001;
-	const int vmax=200;
-	intVector sizes=M.sizes();
-	int dim=M.dimensionality();
-
-	NModel model(dim);
-	myMatrix3 fna(dim, sizes);
-	myMatrix3 f(dim, sizes);
-	myMatrix3 R=M;
-	Vector *F;
-	F=new Vector[dim];
-//	std::cout<< "Prep time: "<<omp_get_wtime()-start<<std::endl;
-	double findFtime=0;
-	double findFnorm=0;
-	cout<<M.m_values[0]<<endl;
-	for (int n=0;n<c_nmax;++n)
-	{
-		double normBF=1;
-		double prevNorm=1;
-
-		double start,fin;
-		std::cout<<n<<"\n";
-//		start = omp_get_wtime();
-
-		if(R.dist(M) < ec )
-		{
-			std::cout<<"!!!!CONGRATULATIONS!!!!!\n";
-			break;
-		}
-
-		Vector bta1=Vector(dim,0);
-		Vector br1=Vector(dim,1);
-		Vector bt1=Vector(dim,0);
-
-		for(int d =0;d<dim;d++)
-		{
-			F[d]=Vector(sizes[d],1); //Must come from M or model
-			normBF*=blaze::sqrNorm(F[d]);
-
-		}
-
-		for (int v=0;v<vmax;++v)
-		{
-			bool e1=true;
-
-//			start = omp_get_wtime();
-			for(int m=0;m<dim;++m)
-			{
-
-				double currNorm=blaze::sqrNorm(F[m]);
-				normBF/=currNorm;
-				normBF*=prevNorm;
-				findF3(m,R,F);
-				F[m]=F[m]/normBF;
-
-				bt1[m]=blaze::norm(F[m]);
-				prevNorm=bt1[m]*bt1[m];
-//				std::cout<<(trans(F[m])*F[m])<<"  "<<bt1[m]<<std::endl;
-				if(v==0)
-				{
-					br1[m]=bt1[m];
-				}
-
-				e1=e1&&((bt1[m]-bta1[m])/br1[m]<eBc);
-			}
-//			fin = omp_get_wtime();
-//			findFtime=findFtime+fin-start;
-			if(e1)
-			{
-				findApprox( f, F);
-				cout<<"=============="<<n<<"=========="<<endl;
-				cout<<M.m_values[0]<<endl;
-
-				R=R-f;
-				fna=fna+f;
-				cout<<fna.m_values[0]<<endl;
-
-
-				//Store n-mode functions in NModel structure
-				for(int m=0;m<dim;++m)
-				{
-					model.F[m].resize(F[m].size(), model.nbrModes+1);
-					column(model.F[m],model.nbrModes)=F[m];
-				}
-				model.nbrModes++;
-
-
-				break;
-			}
-			else
-			{
-				bta1=bt1;
-			}
-
-		}
-
-
-	}
-	delete[] F;
-	return model;
-//	std::cout<<"findFtime: "<<findFtime<<std::endl;
-//	std::cout<<"findFnorm: "<<findFnorm<<std::endl;
-//	nmodel=model;
-
-}
-
-//---------------------------------------------------------------------------------------------------
-
-void findF(const int& dimId, myMatrix& R, Vector* F)
-{
-	R.resetCurrentPosition();
-	F[dimId]=Vector(F[dimId].size(),1);
-	Vector newF=Vector(F[dimId].size(),0);
-	int dim=R.dimensionality();
-	intVector idx(dim,0);
-	double fMult;
-	while(!R.ifEndPosition())
-		//	while(R.ifNotEndPosition())
-	{
-		fMult=1;
-
-		R.getCurrentIdx(idx);
-
-		//		for(int d=0;d<dim;d++)
-		//			fMult*=F[d][idx[d]];
-
-		for(int d=0;d<dim;d++)
-			fMult*=F[d][idx[d]];
-//
-//		for(int d=0;d<dimId;++d)
-//			fMult*=F[d][idx[d]];
-//		for(int d=dimId+1;d<dim;++d)
-//			fMult*=F[d][idx[d]];
-		newF[idx[dimId]]+=R.getCurrentVal()*fMult;
-		R.next();
-	}
-	F[dimId]=newF;
-}
-
-void findF3(const int& dimId, myMatrix3& R, Vector* F)
-{
-	R.resetCurrentPosition();
-	F[dimId]=Vector(F[dimId].size(),1);
-	Vector newF=Vector(F[dimId].size(),0);
-	int dim=R.dimensionality();
-	intVector idx(dim,0);
-	double fMult;
-
-	if(dimId ==0) //0 or 1 (space/time, or 2 max size dimensions)
-	{
-		for(int k=0;k<R.m_paramSize;++k)
-		{
-			R.getCurrentIdx(idx);
-			fMult=1;
-			for(int d=2;d<dim;++d)
-			{
-				fMult*=F[d][idx[d]];
-			}
-			newF+=R.m_values[k]*F[1]*fMult;
-			R.next();
-		}
-		//		newF[idx[dimId]]+=(trans(F[0])*R.m_values[k]*F[1])*fMult;
-	}
-	else if(dimId==1)
-	{
-		for(int k=0;k<R.m_paramSize;++k)
-		{
-			R.getCurrentIdx(idx);
-			fMult=1;
-			for(int d=2;d<dim;++d)
-			{
-				fMult*=F[d][idx[d]];
-			}
-			newF+=trans(R.m_values[k])*F[0]*fMult;
-			R.next();
-		}
-
-	}
-	else
-	{
-		for(int k=0;k<R.m_paramSize;++k)
-		{
-			R.getCurrentIdx(idx);
-			fMult=1;
-			for(int d=2;d<dim;++d)
-				fMult*=F[d][idx[d]];
-			newF[idx[dimId]]+=(trans(F[0])*R.m_values[k]*F[1])*fMult;
-			R.next();
-		}
-	}
-
-	double normBF=1;
-//	for(int d =0;d<dim;d++)
-//	{
-//		if(d!=dimId)
-//		normBF*=blaze::sqrNorm(F[d]);
-//
-//	}
-	F[dimId]=newF/normBF;
-}
-
-//---------------------------------------------------------------------------------------------------
-void findApprox( myMatrix3& R, Vector* F)
-{
-
-	int dim=R.dimensionality();
-	intVector idx(dim,0);
-	R.resetCurrentPosition();
-	Matrix M(R.sizes()[0],R.sizes()[1]);
-	for(int k=0;k<R.m_paramSize;++k)
-	{
-
-		R.getCurrentIdx(idx);
-		double fMult=1;
-		for(int d=2;d<dim;d++)
-			fMult*=F[d][idx[d]];
-		M=F[0]*fMult*trans(F[1]);
-		R.setNext(M);
-	}
-
-}
-
-
-int main234(int argc, char * argv[])
-{
-
-	//initialize and fill test matrix 3x3
-
-
-	unsigned int dim=4;
-	intVector sizes(dim,dim);
-	sizes[0]=5;
-	sizes[1]=4;
-	sizes[2]=3;
-	sizes[3]=2;
-	Matrix m(sizes[0],sizes[1],0);
-	for (int i=0;i<sizes[0];++i)
-	{
-		for (int j=0;j<sizes[1];++j)
-		{
-			m(i,j)=i+i*j+1; cout<<m(i,j)<<" ";
-		}
-		cout<<endl;
-	}
-
-
-	myMatrix3 m3(dim,sizes);
-	m3.setNext(m);
-	m3.setNext(3*m);
-	m3.setNext(5*m);
-
-	m3.setNext(2*m);
-	m3.setNext(4*m);
-	m3.setNext(6*m);
-
-	NModel nm = HOPGD( m3, 0.01);
-	FileManager fmmm;
-	fmmm.saveModel("/home/ikriuchevs//workspace/melted/tests/Ndim/testNmodelSave/", nm);
-	return(0);
-
-
-	//	blaze::setNumThreads( 4 );
-	//	omp_set_num_threads(4);
-	NinputData input;
-	FileManager fm;
-	myMatrix M;
-	//Reading snapshots
-	string snapshots_dir ="/home/ikriuchevs/workspace/melted/tests/369/Snapshots/TxtOutPutFiles/";
-	string valJobsFolder="/home/ikriuchevs/workspace/melted/tests/369/Snapshots/ValidationJobs/";
-	string outFolder="/home/ikriuchevs/workspace/melted/tests/369/testsCpp/ND/";
-	string outFolder2="/home/ikriuchevs/workspace/melted/tests/369/testsCpp/ND2/";
-
-	//	snapshots_dir ="/home/ikriuchevs/workspace/melted/tests/128320/Snapshots/TxtOutPutFiles/";
-	//	valJobsFolder="/home/ikriuchevs/workspace/melted/tests/128320/Snapshots/ValidationJobs/";
-	//	outFolder="/home/ikriuchevs/workspace/melted/tests/128320/testsCpp/ND/";
-	//	outFolder2="/home/ikriuchevs/workspace/melted/tests/128320/testsCpp/ND2/";
-
-	//	snapshots_dir ="/home/ikriuchevs/workspace/melted/tests/11256/Snapshots/TxtOutPutFiles/";
-	//	valJobsFolder="/home/ikriuchevs/workspace/melted/tests/11256/Snapshots/ValidationJobs/";
-	//	outFolder="/home/ikriuchevs/workspace/melted/tests/11256/testsCpp/ND/";
-
-
-	double start = omp_get_wtime();
-	std::cout<<"Reading Files: ";
-	fm.readFolder(snapshots_dir, input);
-
-	FileManager file_manager;
-	std::cout<<"Reading files: ";
-	file_manager.readFolder(snapshots_dir);
-	inputData &inData=file_manager.inData;
-
-	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
-
-	//HOPGD
-	input.error=0.00001;
-	input.nModesMax=200;
-
-	//Creating modes
-
-	start = omp_get_wtime();
-//	std::cout<<"HOPGD: ";
-//	CreateModes modesCreator(input);
-//	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
-//	std::cout<<"#modes = "<<modesCreator.model.nbrModes<<std::endl;
-//	fm.saveModel(outFolder, modesCreator.model);
-
-
-
-	start = omp_get_wtime();
-	std::cout<<"HOPGD3: ";
-	std::cout<<inData.param1DegreOfFreedom<<" "<<inData.spaceDegreOfFreedom<<endl;
-	NinputData3 input3(inData);
-	input3.error=input.error;
-	input3.nModesMax=input.nModesMax;
-	CreateModes modesCreator3(input3);
-	std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
-	std::cout<<"#modes = "<<modesCreator3.model.nbrModes<<std::endl;
-	fm.saveModel(outFolder, modesCreator3.model);
-
-	//Validation
-	//	validation(valJobsFolder,outFolder,modesCreator, input.nModesMax);
-	//	outFolder="/home/ikriuchevs/workspace/melted/tests/369/testsCpp/ND/";
-//	TESTconstNumberOfmodes(input.nModesMax,snapshots_dir,valJobsFolder,outFolder2,false);
-
-	cout<<"\nFinish!"<<endl;
-	return(0);
-
-}
 int main(int argc, char * argv[])
 {
 	odb_initializeAPI();
@@ -848,12 +357,17 @@ int main(int argc, char * argv[])
 	string outFileName=folder+"/nmax"+std::to_string( modesCreator3.nmodel.nbrModes)+".omp"+std::to_string(nthreads)+".dat";
 	outFile = fopen(outFileName.c_str(), "w");
 	fprintf (outFile, "#nbr of modes = %d\n",modesCreator3.nmodel.nbrModes);
-	fprintf (outFile, "#value error time\n");
+	fprintf (outFile, "#Folder Error Time CudaError CudaTime\n");
 	blaze::setNumThreads( nthreads );
+	//CUDA
+	modesCreator3.cudaInitND(20);
+	cv::Mat res;
+	res.create(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows(),opencvMatrixType);
+
 	for(int i=1;i<=8;++i)
 	{
 		string filename=folder+std::to_string(i)+"/just.odb";
-		cout<<filename<<endl;
+//		cout<<filename<<endl;
 		file_manager.readODB2(filename, M);
 
 		string paramname=folder+std::to_string(i)+"/params.dat";
@@ -868,30 +382,32 @@ int main(int argc, char * argv[])
 			if(d>=0)
 			{
 				param[dim-1-2-(d)]=temp;
-
-				std::cout<<temp<<" ";
 			}
 		}
 
 		inFile.close();
 		start = omp_get_wtime();
-		modesCreator3.fitNewND2(param,Mfit);
+		modesCreator3.fitNewND(param,Mfit);
 		fin=omp_get_wtime()-start;
 
 		double err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
 
-		cout<<" error: "<<err<<"%; time = "<<fin<<" sec"<<endl;
+		cout<<blaze::trans(param)<<" : OMP: error: "<<err<<"%; time = "<<fin<<" sec;";
+		fprintf (outFile, "%d %f %lf ", i, err, fin );
 
-		fprintf (outFile, "%d %f %lf\n", i, err, fin );
+		start = omp_get_wtime();
+		modesCreator3.fitNewNDCuda(param,res);
+		fin = omp_get_wtime()-start;
 
+		opencv2blaze(res,Mfit);
+
+		err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
+		std::cout<<" CUDA: error="<<err<<"%; time = "<<fin  << " sec"<<std::endl;
+		fprintf (outFile, "%f %lf\n", err, fin );
 
 	}
 	fclose (outFile);
 
-	sizes[0]=8; //Temperature
-	sizes[1]=1; //Specific heat
-	sizes[2]=1; //Density
-	sizes[3]=1; //Density
 
 
 	odb_finalizeAPI();

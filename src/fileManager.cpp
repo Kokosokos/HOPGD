@@ -193,7 +193,7 @@ void FileManager::saveModel(string dirPath, const NModel& model)
 		outFile<<model.F[d].rows()<<" ";
 	outFile<<"\n";
 
-	std::cout<<model.params.size()<<" "<<model.params[0].size()<<std::endl;
+//	std::cout<<model.params.size()<<" "<<model.params[0].size()<<std::endl;
 	for (int i=0;i<model.params.size();++i)
 	{
 		for (int j=0;j<model.params[i].size();++j)
@@ -407,7 +407,7 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 		inFile.open(fname, std::ios_base::in);
 		double temp=0;
 		Vector param(dim-2,0);
-		std::cout<<"params: "<<k<<" ";
+//		std::cout<<"params: "<<k<<" ";
 //		for(int d=0;d<dim-2;++d)
 //		{
 //			inFile>>temp;
@@ -423,16 +423,16 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 			{
 				param[d]=temp;
 
-				std::cout<<temp<<" ";
+//				std::cout<<temp<<" ";
 			}
 		}
 		allParams.push_back(param);
-		std::cout<<"\n";
+//		std::cout<<"\n";
 		inFile.close();
 
 	}
 //	std::reverse(allParams.begin(), allParams.end());
-	std::cout<<"1\n";
+//	std::cout<<"1\n";
 	int jump=1;//Ndata.A.m_matrix_size;
 	for(int d=2;d<dim;++d)
 	{
@@ -446,7 +446,7 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 	}
 	//--------------------------------------------
 
-	std::cout<<"2\n";
+//	std::cout<<"2\n";
 }
 //---------------------------------------------------------------------------------------------------
 

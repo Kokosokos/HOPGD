@@ -29,21 +29,21 @@ int searchUpperNearest(const Vector& p,double v)
 
 void CreateModes::HOPGD( const myMatrix3& M, double ec)
 {
-//	const int c_nmax=100;
+	//	const int c_nmax=100;
 	double start,fin;
-//	start = omp_get_wtime();
+	//	start = omp_get_wtime();
 	const double eBc=0.000001;
 	const int vmax=2400;
 	intVector sizes=M.sizes();
 	int dim=M.dimensionality();
 
 	NModel model(dim);
-//	myMatrix3 fna(dim, sizes);
+	//	myMatrix3 fna(dim, sizes);
 	myMatrix3 f(dim, sizes);
 	myMatrix3 R=M;
 	Vector *F;
 	F=new Vector[dim];
-//	std::cout<< "Prep time: "<<omp_get_wtime()-start<<std::endl;
+	//	std::cout<< "Prep time: "<<omp_get_wtime()-start<<std::endl;
 	double findFtime=0;
 	double findFnorm=0;
 	for (int n=0;n<c_nmax;++n)
@@ -55,7 +55,7 @@ void CreateModes::HOPGD( const myMatrix3& M, double ec)
 		std::cout<<"\n";
 		std::cout<<n<<": v: ";
 		std::cout.flush();
-//		start = omp_get_wtime();
+		//		start = omp_get_wtime();
 
 		if(R.dist(M) < ec )
 		{
@@ -80,7 +80,7 @@ void CreateModes::HOPGD( const myMatrix3& M, double ec)
 			std::cout.flush();
 			bool e1=true;
 
-//			start = omp_get_wtime();
+			//			start = omp_get_wtime();
 			for(int m=0;m<dim;++m)
 			{
 
@@ -92,7 +92,7 @@ void CreateModes::HOPGD( const myMatrix3& M, double ec)
 
 				bt1[m]=blaze::norm(F[m]);
 				prevNorm=bt1[m]*bt1[m];
-//				std::cout<<(trans(F[m])*F[m])<<"  "<<bt1[m]<<std::endl;
+				//				std::cout<<(trans(F[m])*F[m])<<"  "<<bt1[m]<<std::endl;
 				if(v==0)
 				{
 					br1[m]=bt1[m];
@@ -100,14 +100,14 @@ void CreateModes::HOPGD( const myMatrix3& M, double ec)
 
 				e1=e1&&((bt1[m]-bta1[m])/br1[m]<eBc);
 			}
-//			fin = omp_get_wtime();
-//			findFtime=findFtime+fin-start;
+			//			fin = omp_get_wtime();
+			//			findFtime=findFtime+fin-start;
 			if(e1)
 			{
 				findApprox( f, F);
 
 				R=R-f;
-//				fna=fna+f;
+				//				fna=fna+f;
 
 
 				//Store n-mode functions in NModel structure
@@ -131,8 +131,8 @@ void CreateModes::HOPGD( const myMatrix3& M, double ec)
 
 	}
 	delete[] F;
-//	std::cout<<"findFtime: "<<findFtime<<std::endl;
-//	std::cout<<"findFnorm: "<<findFnorm<<std::endl;
+	//	std::cout<<"findFtime: "<<findFtime<<std::endl;
+	//	std::cout<<"findFnorm: "<<findFnorm<<std::endl;
 	nmodel=model;
 
 }
@@ -141,7 +141,7 @@ void CreateModes::HOPGD( const myMatrix& M, double ec)
 {
 
 	double start,fin;
-//	start = omp_get_wtime();
+	//	start = omp_get_wtime();
 	const double eBc=0.000001;
 	const int vmax=200;
 	intVector sizes=M.sizes();
@@ -153,7 +153,7 @@ void CreateModes::HOPGD( const myMatrix& M, double ec)
 	myMatrix R=M;
 	Vector *F;
 	F=new Vector[dim];
-//	std::cout<< "Prep time: "<<omp_get_wtime()-start<<std::endl;
+	//	std::cout<< "Prep time: "<<omp_get_wtime()-start<<std::endl;
 	double findFtime=0;
 	double findFnorm=0;
 
@@ -164,15 +164,15 @@ void CreateModes::HOPGD( const myMatrix& M, double ec)
 
 		double start,fin;
 		std::cout<<n<<"\n";
-//		start = omp_get_wtime();
+		//		start = omp_get_wtime();
 
 		if(R.dist(M) < ec )
 		{
-//			std::cout<<"!!!!CONGRATULATIONS!!!!!\n";
+			//			std::cout<<"!!!!CONGRATULATIONS!!!!!\n";
 			break;
 		}
-//		fin = omp_get_wtime();
-//		findFnorm=findFnorm+fin-start;
+		//		fin = omp_get_wtime();
+		//		findFnorm=findFnorm+fin-start;
 		//Initialial values
 		Vector bta1=Vector(dim,0);
 		Vector br1=Vector(dim,1);
@@ -189,7 +189,7 @@ void CreateModes::HOPGD( const myMatrix& M, double ec)
 		{
 			bool e1=true;
 
-//			start = omp_get_wtime();
+			//			start = omp_get_wtime();
 			for(int m=0;m<dim;++m)
 			{
 
@@ -201,7 +201,7 @@ void CreateModes::HOPGD( const myMatrix& M, double ec)
 
 				bt1[m]=blaze::norm(F[m]);
 				prevNorm=bt1[m]*bt1[m];
-//				std::cout<<(trans(F[m])*F[m])<<"  "<<bt1[m]<<std::endl;
+				//				std::cout<<(trans(F[m])*F[m])<<"  "<<bt1[m]<<std::endl;
 				if(v==0)
 				{
 					br1[m]=bt1[m];
@@ -209,14 +209,14 @@ void CreateModes::HOPGD( const myMatrix& M, double ec)
 
 				e1=e1&&((bt1[m]-bta1[m])/br1[m]<eBc);
 			}
-//			fin = omp_get_wtime();
-//			findFtime=findFtime+fin-start;
+			//			fin = omp_get_wtime();
+			//			findFtime=findFtime+fin-start;
 			if(e1)
 			{
 				findApprox( f, F);
 
 				R=R-f;
-//				fna=fna+f;
+				//				fna=fna+f;
 
 
 				//Store n-mode functions in NModel structure
@@ -240,8 +240,8 @@ void CreateModes::HOPGD( const myMatrix& M, double ec)
 
 	}
 	delete[] F;
-//	std::cout<<"findFtime: "<<findFtime<<std::endl;
-//	std::cout<<"findFnorm: "<<findFnorm<<std::endl;
+	//	std::cout<<"findFtime: "<<findFtime<<std::endl;
+	//	std::cout<<"findFnorm: "<<findFnorm<<std::endl;
 	nmodel=model;
 
 }
@@ -250,7 +250,7 @@ void CreateModes::HOPGD( const myMatrix& M, double ec)
 #ifndef NOindexArray
 void CreateModes::findF(const int& dimId, myMatrix& R, Vector* F)
 {
-//	R.resetCurrentPosition();
+	//	R.resetCurrentPosition();
 	F[dimId]=Vector(F[dimId].size(),1);
 	Vector newF=Vector(F[dimId].size(),0);
 	int dim=R.dimensionality();
@@ -283,14 +283,14 @@ void CreateModes::findF(const int& dimId, myMatrix& R, Vector* F)
 	intVector idx(dim,0);
 	double fMult;
 	while(!R.ifEndPosition())
-//	while(R.ifNotEndPosition())
+		//	while(R.ifNotEndPosition())
 	{
 		fMult=1;
 
 		R.getCurrentIdx(idx);
 
-//		for(int d=0;d<dim;d++)
-//			fMult*=F[d][idx[d]];
+		//		for(int d=0;d<dim;d++)
+		//			fMult*=F[d][idx[d]];
 
 		for(int d=0;d<dimId;++d)
 			fMult*=F[d][idx[d]];
@@ -379,12 +379,12 @@ void CreateModes::findF(const int& dimId, myMatrix3& R, Vector* F)
 	}
 
 	double normBF=1;
-//	for(int d =0;d<dim;d++)
-//	{
-//		if(d!=dimId)
-//		normBF*=blaze::sqrNorm(F[d]);
-//
-//	}
+	//	for(int d =0;d<dim;d++)
+	//	{
+	//		if(d!=dimId)
+	//		normBF*=blaze::sqrNorm(F[d]);
+	//
+	//	}
 	F[dimId]=newF/normBF;
 }
 //---------------------------------------------------------------------------------------------------
@@ -497,8 +497,8 @@ CreateModes::CreateModes(const inputData& inData,int nmax):c_nmax(nmax)
 
 
 	double bta1=0;
-    double bta2=0;
-    double bta3=0;
+	double bta2=0;
+	double bta3=0;
 	Matrix* R;
 	R=new Matrix[inData.param1DegreOfFreedom];
 	//~f^m - mth mode of approximation
@@ -658,10 +658,10 @@ void CreateModes::fitNew_Loops(const double& newParam1, Matrix& result) const
 	//param1.find(newParam1);
 
 	int idx=searchUpperNearest(model.param1,newParam1);
-//	std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
+	//	std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
 	if( idx > 0 && idx < model.param1.size())
 	{
-//		std::cout<<"model.F3 size"<<model.F3.rows()<<std::endl;
+		//		std::cout<<"model.F3 size"<<model.F3.rows()<<std::endl;
 		Vector low=column(trans(model.F3),idx-1);
 		Vector up=column(trans(model.F3),idx);
 		Vector Vinter=low+(up-low)*(1.0/(model.param1[idx]-model.param1[idx-1])*(newParam1-model.param1[idx-1]));
@@ -670,9 +670,9 @@ void CreateModes::fitNew_Loops(const double& newParam1, Matrix& result) const
 		result=0;
 
 		for( uint i=0; i<model.F1.rows();++i)
-		        for (uint j=0; j<model.F2.rows();++j)
-		            for(uint mode=0;mode<model.nbrModes;++mode)
-		            	result(i,j) = result(i,j)+  model.F1(i,mode)*model.F2(j,mode)*Vinter[mode];
+			for (uint j=0; j<model.F2.rows();++j)
+				for(uint mode=0;mode<model.nbrModes;++mode)
+					result(i,j) = result(i,j)+  model.F1(i,mode)*model.F2(j,mode)*Vinter[mode];
 
 	}
 	else
@@ -734,61 +734,7 @@ void CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
 
 	}
 }
-void CreateModes::fitNewND2(const Vector& newParam1, Matrix& result) const
-{
-	if(nmodel.dim==3)
-	{
-		fitNew(newParam1[0], result);
-	}
-	else
-	{
-		Vector Vinter(nmodel.nbrModes,1);
-		for(int d=2;d<nmodel.dim;++d)
-		{
-			int idx=searchUpperNearest(nmodel.params[d-2],newParam1[d-2]);
-			if( idx >= 0 && idx < nmodel.params[d-2].size())
-			{
-				int idxlow=idx==0?idx:idx-1;
-				Vector low=column(trans(nmodel.F[d]),idxlow);
-				Vector up=column(trans(nmodel.F[d]),idx);
 
-				Vector Vinter2;
-				if(idx ==0 && newParam1==nmodel.params[d-2][idx])
-				{
-					Vinter2=low;
-				}
-				else
-				{
-
-
-					Vinter2=low+(up-low)*(1.0/(nmodel.params[d-2][idx]-nmodel.params[d-2][idx-1])*(newParam1[d-2]-nmodel.params[d-2][idx-1]));
-				}
-				Vinter=Vinter*Vinter2;
-			}
-			else
-			{
-				std::cout<<"Enrichment is needed\n";
-			}
-		}
-		result.resize(nmodel.F[0].rows(),nmodel.F[1].rows(),false);
-		result=0;
-		Matrix result2=result;
-		Matrix F1temp=nmodel.F[1];
-
-//		for(uint mode=0;mode<nmodel.nbrModes;++mode)
-//		{
-//			double temp=Vinter[mode];
-//			column(F1temp,mode)=temp*column(F1temp,mode);
-//		}
-		result=nmodel.F[0]*trans(nmodel.F[1]);
-		for(uint mode=0;mode<nmodel.nbrModes;++mode)
-		{
-			double temp=Vinter[mode];
-			column(result,mode)=temp*column(result,mode);
-		}
-
-	}
-}
 //---------------------------------------------------------------------------------------------------
 
 void CreateModes::fitNew(const double& newParam1, Matrix& result) const
@@ -797,7 +743,7 @@ void CreateModes::fitNew(const double& newParam1, Matrix& result) const
 	//param1.find(newParam1);
 
 	int idx=searchUpperNearest(model.param1,newParam1);
-//	std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
+	//	std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
 	if( idx > 0 && idx < model.param1.size())
 	{
 		Vector low=column(trans(model.F3),idx-1);
@@ -838,7 +784,7 @@ void CreateModes::fitNew(const double& newParam1, Matrix& result, int nModes) co
 
 	int idx=searchUpperNearest(model.param1,newParam1);
 	std::cout<< omp_get_wtime() - start<<" ";//1
-//	std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
+	//	std::cout<<idx<<" "<<newParam1<<"< "<<param1[idx]<<"\n";
 	if( idx > 0 && idx < model.param1.size())
 	{
 		start = omp_get_wtime();
@@ -949,6 +895,44 @@ void CreateModes::cudaInit(int nModes)
 	m_ifCudaInit=true;
 	d_src.download(m);
 }
+//---------------------------------------------------------------------------------------------------
+
+void CreateModes::cudaInitND(int nModes)
+{
+	cvnmodel=cvNModel(nmodel.dim);
+//	cvnmodel.dim=nmodel.dim;
+
+	int rows=nmodel.F[0].rows();
+	int cols=nmodel.F[1].rows();
+
+	if (nModes<0 || nModes > nmodel.nbrModes)
+	{
+		nModes=nmodel.nbrModes;
+		for(int d=0;d<cvnmodel.dim;++d)
+			blaze2opencv(nmodel.F[d],cvnmodel.F[d]);
+
+	}
+	else
+	{
+		for(int d=0;d<cvnmodel.dim;++d)
+			blaze2opencv(submatrix(nmodel.F[d],0,0,nmodel.F[d].rows(),nModes),cvnmodel.F[d]);
+	}
+
+	int CudaDevice = cv::cuda::getDevice();
+	cv::cuda::setDevice(CudaDevice);
+	cv::Mat m = cv::Mat::ones(rows, cols, opencvMatrixType);
+	cv::cuda::GpuMat d_src;
+	cv::cuda::GpuMat d_src2;
+	cv::cuda::GpuMat d_src3(cols,cols,opencvMatrixType);
+	d_src.upload(m);
+	d_src2.upload(m.t());
+
+
+	cv::cuda::gemm(d_src2, d_src, 1.0, cv::cuda::GpuMat(), 0.0, d_src3);
+	m_ifCudaInit=true;
+	d_src.download(m);
+}
+//---------------------------------------------------------------------------------------------------
 
 void CreateModes::fitNewCuda(const double& newParam1,cv::Mat &result) const
 {
@@ -1020,4 +1004,72 @@ void CreateModes::fitNewCuda(const double& newParam1,cv::Mat &result) const
 		std::cout<<"Enrichment is needed: "<<idx<<std::endl;
 	}
 
+}
+//---------------------------------------------------------------------------------------------------
+
+void CreateModes::fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const
+{
+	if(nmodel.dim==3)
+	{
+		fitNewCuda(newParam1[0], result);
+	}
+	else
+	{
+		Vector Vinter(nmodel.nbrModes,1);
+		for(int d=2;d<nmodel.dim;++d)
+		{
+			int idx=searchUpperNearest(nmodel.params[d-2],newParam1[d-2]);
+			if( idx >= 0 && idx < nmodel.params[d-2].size())
+			{
+				int idxlow=idx==0?idx:idx-1;
+				Vector low=column(trans(nmodel.F[d]),idxlow);
+				Vector up=column(trans(nmodel.F[d]),idx);
+
+				Vector Vinter2;
+				if(idx ==0 && newParam1==nmodel.params[d-2][idx])
+				{
+					Vinter2=low;
+				}
+				else
+				{
+
+
+					Vinter2=low+(up-low)*(1.0/(nmodel.params[d-2][idx]-nmodel.params[d-2][idx-1])*(newParam1[d-2]-nmodel.params[d-2][idx-1]));
+				}
+				Vinter=Vinter*Vinter2;
+			}
+			else
+			{
+				std::cout<<"Enrichment is needed\n";
+			}
+		}
+
+		cv::Mat F1temp=cvnmodel.F[1].clone();
+
+		for(uint mode=0;mode<nmodel.nbrModes;++mode)
+		{
+			double temp=Vinter[mode];
+			F1temp.col(mode)=temp*F1temp.col(mode);
+		}
+
+//		double start = omp_get_wtime();
+		cv::cuda::GpuMat dummy;
+		cv::cuda::GpuMat gf1;
+		gf1.upload(cvnmodel.F[0]);
+		cv::cuda::GpuMat gf2;
+		gf2.upload(F1temp);
+		cv::cuda::transpose(gf2,gf2);
+		cv::cuda::GpuMat gres;
+
+//		std::cout<< omp_get_wtime() - start<<" ";//5
+
+//		start = omp_get_wtime();
+		cv::cuda::gemm(gf1, gf2, 1.0, cv::cuda::GpuMat(), 0.0, gres);
+//		std::cout<< omp_get_wtime() - start<<" ";//6
+
+//		start = omp_get_wtime();
+		gres.download(result);
+//		std::cout<< omp_get_wtime() - start<<" ";//7
+
+	}
 }

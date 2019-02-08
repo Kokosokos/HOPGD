@@ -30,20 +30,23 @@ public:
 
 	//using blaze matrix multiplication
 	void fitNewND(const Vector& newParam1, Matrix& result) const;
-	void fitNewND2(const Vector& newParam1, Matrix& result) const;
 
 	void fitNew(const double& newParam1, Matrix& result) const;
 	void fitNew(const double& newParam1, Matrix& result, int nModes) const;
 
 	//using opencv::cuda matrix multiplication
 	void cudaInit(int nModes=-1);
+	void cudaInitND(int nModes=-1);
+
 	void fitNewCuda(const double& newParam1, cv::Mat &result) const;
+	void fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const;
 
 
 
 	Model model;
 	cvModel cvmodel;
 	NModel nmodel;
+	cvNModel cvnmodel;
 
 private:
 	void findF(const int& dimId, myMatrix& R, Vector* F);

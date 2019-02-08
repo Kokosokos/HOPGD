@@ -93,6 +93,16 @@ struct NModel
 //	NModel operator = (NModel nm){ NModel temp(dim); temp.nbrModes=nm.nbrModes;for (int i=0;i<dim;++i)temp.F[i]=nm.F[i];return temp;};
 
 };
+struct cvNModel
+{
+	int nbrModes;
+	int dim;
+	std::vector<cv::Mat> F;
+	std::vector<Vector> params;
+
+	cvNModel(){};
+	cvNModel(int d){dim=d; F=std::vector<cv::Mat>(dim);nbrModes=0;};
+};
 //===================================================================================================
 //---------------------------------------------------------------------------------------------------
 
