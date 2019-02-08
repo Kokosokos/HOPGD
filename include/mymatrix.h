@@ -103,79 +103,7 @@ struct cvNModel
 	cvNModel(){};
 	cvNModel(int d){dim=d; F=std::vector<cv::Mat>(dim);nbrModes=0;};
 };
-//===================================================================================================
-//---------------------------------------------------------------------------------------------------
 
-class myMatrix
-{
-public:
-	myMatrix();
-	~myMatrix();
-	myMatrix(int dim, intVector sizes);
-
-	void		setSize(int dim, intVector sizes);
-	intVector	sizes() const;
-
-	int		dimensionality() const;
-
-	bool	next();
-	void	incrementIndex(int d);
-	bool	ifEndPosition();
-	bool	ifNotEndPosition();
-	bool	getNext(double& val);
-	bool	setNext(const double& val);
-	bool	append(const Vector& m, int paramId);
-
-
-
-	void  resetCurrentPosition();
-	double	getCurrentVal();
-	int		getCurrentPosition();
-	void	getCurrentIdx(intVector& idx);
-	bool	goToIdx(intVector idx);
-	bool	goToPos(int pos);
-
-
-	double	getElement(int pos);
-	double	getElement(const intVector idx);
-	void	setElement(int pos, double val);
-	void	setElement(intVector idx, double val);
-
-	double	dist( myMatrix m2);
-
-//	myMatrix operator - (const myMatrix& m2);
-	myMatrix& operator - (const myMatrix& m2);
-	myMatrix& operator + (const myMatrix& m2);
-
-//private:
-	bool	ifCompatible(const myMatrix& m2);
-	bool	getPosFromIdx(const intVector& idx, int& pos);
-	bool	getIdxFromPos(intVector& idx, int pos);
-	bool	checkPos(int pos);
-
-
-	int			m_dim;
-	intVector	m_sizes;
-	intVector	m_cumul_sizes;
-#ifndef NOindexArray
-	std::vector<intVector> m_index;
-#endif
-	int			m_totSize; // m_sizes[0]*m_sizes[1]....
-	Vector		m_values;
-
-	int m_current_position;
-	intVector m_current_index;
-};
-
-struct NinputData
-{
-
-	float	error;
-	int nModesMax;
-	std::vector<Vector> params;
-
-	myMatrix A;
-};
 
 
 #endif /* MATRIXVECTOR_H_ */

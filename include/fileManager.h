@@ -29,9 +29,7 @@ public:
 	void readFolder(string foldername);
 	void readODB(string filename, Matrix& m);
 
-	void readFolder(string foldername, NinputData& Ndata);
 	void readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, int& timeDegreOfFreedom);
-	void readODB(string filename, myMatrix& m, intVector sizes);
 
 	void readFolder(string foldername, NinputData3& Ndata, int dim, intVector sizes);
 	void readODB2(string filename, Matrix& m);

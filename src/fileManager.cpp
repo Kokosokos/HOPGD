@@ -318,59 +318,6 @@ void FileManager::readODB(string filename, Matrix& m)
 //---------------------------------------------------------------------------------------------------
 //Makes sure parameters are sorted and files are read in right order
 //Creates EMPTY myMatrix
-void FileManager::readFolder(string foldername, NinputData& Ndata)
-{
-	path p = path(foldername);
-	directory_iterator it(p);
-	string filenameString="heatTransfer_Conductivity_";
-	int nFiles=0;
-
-	int spaceDegreOfFreedom=0;
-	int timeDegreOfFreedom=0;
-	int param1DegreOfFreedom=std::count_if(directory_iterator(p), directory_iterator(), static_cast<bool(*)(const path&)>(is_directory));
-
-	Ndata.params.push_back(Vector(param1DegreOfFreedom,0));
-	SVector sparam1(param1DegreOfFreedom);
-	int k=0;
-
-	string folderBaseName;
-	while (it != directory_iterator{})
-		if(is_directory(it->path()))
-		{
-			string folder=it->path().generic_string();
-			std::size_t	found=folder.rfind("_");
-			folderBaseName=folder.substr(0,found+1);
-			string folderParam1=folder.substr(found+1);
-			Ndata.params[0][k]=my_stod(folderParam1);
-			sparam1[k]=folderParam1;
-			it++;
-			k++;
-		}
-	//!SORT param1 array++++++++
-	vectorSort2(Ndata.params[0],sparam1);
-	//+++++++++++++++++++++++++++
-	k=0;
-	path file(folderBaseName+sparam1[k]);
-	string new_filename = file.generic_string() + string("/")+filenameString+sparam1[k]+string(".odb");
-	readODB_SpacexTime(new_filename,spaceDegreOfFreedom,timeDegreOfFreedom);
-
-	intVector sizes(3,0);
-	sizes[0]=spaceDegreOfFreedom;
-	sizes[1]=timeDegreOfFreedom;
-	sizes[2]=param1DegreOfFreedom;
-	Ndata.A.setSize(3,sizes);
-	Ndata.A.resetCurrentPosition();
-	for (int k=0;k<param1DegreOfFreedom;++k)
-	{
-		path file(folderBaseName+sparam1[k]);
-		string new_filename = file.generic_string() + string("/")+filenameString+sparam1[k]+string(".odb");
-		readODB(new_filename, Ndata.A,sizes);
-
-	}
-	//--------------------------------------------
-
-
-}
 
 //---------------------------------------------------------------------------------------------------
 void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, intVector param_sizes)
@@ -415,7 +362,7 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 //			Ndata.params.push_back(param);
 //			std::cout<<temp<<" ";
 //		}
-		//TEMPORARY
+		//TEMPORARY?
 		for(int d=0;d<dim-2;++d)
 		{
 			inFile>>temp;
@@ -500,37 +447,7 @@ void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, 
 //	odb_finalizeAPI();
 }
 
-//Appends data to myMatrix
-void FileManager::readODB(string filename, myMatrix& m,intVector sizes)
-{
-	odb_initializeAPI();
 
-	int spaceDegreOfFreedom=sizes[0];
-	int timeDegreOfFreedom=sizes[1];
-	odb_Odb& myOdb = openOdb(filename.c_str(), true);
-
-	odb_StepRepository& steps = myOdb.steps();
-	odb_String stepName("Step-1",6);
-	odb_Step& step = steps[stepName];	odb_SequenceFrame& allFramesInStep = step.frames();
-	for(int timeID =0;timeID<timeDegreOfFreedom;++timeID)
-	{
-		const odb_SequenceFieldValue& temp =
-				allFramesInStep[timeID].fieldOutputs()["NT11"].values();
-		int numComp = 0;
-		for (int spaceID=0; spaceID<spaceDegreOfFreedom; spaceID++)
-		{
-			const odb_FieldValue val = temp[spaceID];
-			const float* const NT11 = val.data(numComp);
-			int comp=0;
-			m.setNext(double(NT11[comp]));
-		}
-
-	}
-
-
-	myOdb.close();
-	odb_finalizeAPI();
-}
 //---------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------

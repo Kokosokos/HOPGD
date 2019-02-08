@@ -22,7 +22,6 @@ public:
 	//3D method
 	CreateModes(const inputData& inData,int nmax=500);
 	//ND method
-	CreateModes(const NinputData& input);
 	CreateModes(const NinputData3& input);
 
 	//using triple nested loop
@@ -49,13 +48,10 @@ public:
 	cvNModel cvnmodel;
 
 private:
-	void findF(const int& dimId, myMatrix& R, Vector* F);
-	void findApprox( myMatrix& R, Vector* F);
 
 	void findApprox( myMatrix3& R, Vector* F);
 	void findF(const int& dimId, myMatrix3& R, Vector* F);
 
-	void HOPGD( const myMatrix& M, double ec);
 	void HOPGD( const myMatrix3& M, double ec);
 	const int c_nmax;
 	bool m_ifCudaInit;
