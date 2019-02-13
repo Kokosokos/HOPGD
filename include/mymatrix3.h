@@ -67,18 +67,16 @@ public:
 	int			m_dim;
 	intVector	m_sizes;
 	intVector	m_cumul_sizes;
-#ifndef NOindexArray
-	std::vector<intVector> m_index;
-#endif
+
 	int			m_totSize; // m_sizes[0]*m_sizes[1]....
 	int			m_matrix_size; // m_sizes[0]*m_sizes[1]....
 	int			m_paramSize;
 
 	std::vector<Matrix> m_values;
 
-	int m_current_position;
-	int m_current_param_position;
-	intVector m_current_index;
+	int			m_current_position;
+	int			m_current_param_position;
+	intVector	m_current_index;
 };
 
 struct NinputData3

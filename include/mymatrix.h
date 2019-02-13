@@ -16,7 +16,7 @@
 #include <blaze/math/Column.h>
 #include <blaze/math/DynamicVector.h>
 #include <blaze/math/Subvector.h>
-//typedef myMatrix Matrix;
+
 typedef blaze::DynamicMatrix<double,blaze::rowMajor> Matrix;
 typedef blaze::DynamicMatrix<double,blaze::columnMajor> cMatrix;
 typedef blaze::DynamicVector<double,blaze::rowMajor> Vector;
