@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> /* strtof */
 #include "fileManager.h"
-//#include "mymatrix3.h"
+//#include "NDMatrix.h"
 
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;

@@ -9,7 +9,7 @@
 #define FILEMANAGER_H_
 
 #include <string>
-#include "mymatrix3.h"
+#include "NDMatrix.h"
 
 //typedef SimpleMatrix2D Matrix;
 

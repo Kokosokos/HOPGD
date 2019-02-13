@@ -14,13 +14,13 @@
 //===================================================================================================
 //---------------------------------------------------------------------------------------------------
 
-class myMatrix3
+class NDMatrix
 {
 public:
-	myMatrix3();
-	myMatrix3(const inputData& data);
-	~myMatrix3();
-	myMatrix3(int dim, intVector sizes);
+	NDMatrix();
+	NDMatrix(const inputData& data);
+	~NDMatrix();
+	NDMatrix(int dim, intVector sizes);
 
 	void		setSize(int dim, intVector sizes);
 	intVector	sizes() const;
@@ -50,14 +50,13 @@ public:
 //	void	setElement(int pos, double val);
 //	void	setElement(intVector idx, double val);
 
-	double	dist( myMatrix3 m2);
+	double	dist( NDMatrix m2);
 
-//	myMatrix3 operator - (const myMatrix3& m2);
-	myMatrix3& operator - (const myMatrix3& m2);
-	myMatrix3& operator + (const myMatrix3& m2);
+	NDMatrix& operator - (const NDMatrix& m2);
+	NDMatrix& operator + (const NDMatrix& m2);
 
 //private:
-	bool	ifCompatible(const myMatrix3& m2);
+	bool	ifCompatible(const NDMatrix& m2);
 	bool	getPosFromIdx(const intVector& idx, int& pos);
 	bool	getIdxFromPos(intVector& idx, int pos);
 	bool	checkPos(int pos);
@@ -86,7 +85,7 @@ struct NinputData3
 	int nModesMax;
 	std::vector<Vector> params;
 
-	myMatrix3 A;
+	NDMatrix A;
 	NinputData3(){};
 	NinputData3(inputData data):A(data),error(data.error){params.push_back(data.param1);};
 };

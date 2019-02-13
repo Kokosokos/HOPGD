@@ -9,7 +9,7 @@
 #define CREATEMODES_H_
 
 #include "fileManager.h"
-#include "mymatrix3.h"
+#include "NDMatrix.h"
 //typedef blaze::DynamicVector<Matrix,blaze::rowMajor> MVector;
 
 /**
@@ -116,21 +116,21 @@ public:
 
 private:
 
-	void findApprox( myMatrix3& R, Vector* F);
+	void findApprox( NDMatrix& R, Vector* F);
 	/**
 	 * @brief Finds the basis function F[dimId] assuming that all the rest F[*] are known.  \f$ R= \prod_{d=1}^{N}  F_d \f$
 	 * @param dimId The dimension index of the basis vector that is unknown.
 	 * @param R Residuals matrix that is being decomposed.
 	 * @param F the vector of basis vectors.
 	 */
-	void findF(const int& dimId, myMatrix3& R, Vector* F);
+	void findF(const int& dimId, NDMatrix& R, Vector* F);
 
 	/**
 	 * @brief N Dimensional HOPGD routine.
 	 * @param M N Dimensional to be decomposed.
 	 * @param ec Precision.
 	 */
-	void HOPGD( const myMatrix3& M, double ec);
+	void HOPGD( const NDMatrix& M, double ec);
 
 	/**
 	 * The maximum number of modes used in model.

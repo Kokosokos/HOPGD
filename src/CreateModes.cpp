@@ -27,7 +27,7 @@ int searchUpperNearest(const Vector& p,double v)
 }
 //---------------------------------------------------------------------------------------------------
 
-void CreateModes::HOPGD( const myMatrix3& M, 	double ec)
+void CreateModes::HOPGD( const NDMatrix& M, 	double ec)
 {
 	//	const int c_nmax=100;
 	double start,fin;
@@ -38,9 +38,9 @@ void CreateModes::HOPGD( const myMatrix3& M, 	double ec)
 	int dim=M.dimensionality();
 
 	NModel model(dim);
-	//	myMatrix3 fna(dim, sizes);
-	myMatrix3 f(dim, sizes);
-	myMatrix3 R=M;
+	//	NDMatrix fna(dim, sizes);
+	NDMatrix f(dim, sizes);
+	NDMatrix R=M;
 	Vector *F;
 	F=new Vector[dim];
 	//	std::cout<< "Prep time: "<<omp_get_wtime()-start<<std::endl;
@@ -140,7 +140,7 @@ void CreateModes::HOPGD( const myMatrix3& M, 	double ec)
 //---------------------------------------------------------------------------------------------------
 
 
-void CreateModes::findF(const int& dimId, myMatrix3& R, Vector* F)
+void CreateModes::findF(const int& dimId, NDMatrix& R, Vector* F)
 {
 	R.resetCurrentPosition();
 	F[dimId]=Vector(F[dimId].size(),1);
@@ -202,7 +202,7 @@ void CreateModes::findF(const int& dimId, myMatrix3& R, Vector* F)
 	F[dimId]=newF/normBF;
 }
 //---------------------------------------------------------------------------------------------------
-void CreateModes::findApprox( myMatrix3& R, Vector* F)
+void CreateModes::findApprox( NDMatrix& R, Vector* F)
 {
 
 	int dim=R.dimensionality();
