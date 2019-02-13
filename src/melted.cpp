@@ -17,8 +17,6 @@
 
 
 
-void cudaInit(int rows,int cols);
-void fitNew(const double& newParam1, cv::Mat &result,const cv::Mat &F1, const cv::Mat &F2, const Matrix &F3, const Vector& param1);
 using namespace boost::filesystem;
 
 using namespace std;

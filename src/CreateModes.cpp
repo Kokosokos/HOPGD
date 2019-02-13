@@ -27,7 +27,7 @@ int searchUpperNearest(const Vector& p,double v)
 }
 //---------------------------------------------------------------------------------------------------
 
-void CreateModes::HOPGD( const myMatrix3& M, double ec)
+void CreateModes::HOPGD( const myMatrix3& M, 	double ec)
 {
 	//	const int c_nmax=100;
 	double start,fin;

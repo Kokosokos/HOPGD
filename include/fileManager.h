@@ -32,6 +32,7 @@ public:
 	void readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, int& timeDegreOfFreedom);
 
 	void readFolder(string foldername, NinputData3& Ndata, int dim, intVector sizes);
+	void readParams(string foldername, NinputData3& Ndata, int dim, intVector sizes);
 	void readODB2(string filename, Matrix& m);
 
 	void write(string filename, const Matrix& m);

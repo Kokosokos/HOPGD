@@ -13,7 +13,8 @@ using namespace boost::filesystem;
 //using std::string;
 typedef blaze::DynamicVector<string,blaze::rowMajor> SVector;
 const int c_tmax=100;
-
+const string c_parameters_filename="params.dat";
+const string c_odb_filename="just.odb";
 //---------------------------------------------------------------------------------------------------
 class sort_indices
 {
@@ -304,6 +305,56 @@ void FileManager::readODB(string filename, Matrix& m)
 }
 
 //---------------------------------------------------------------------------------------------------
+//Reads parameters
+void FileManager::readParams(string foldername, NinputData3& Ndata, int dim, intVector sizes)
+{
+	vector<Vector> allParams;
+	for (int k=1;k<Ndata.A.m_paramSize+1;++k)
+	{
+		string folder=foldername+"/"+std::to_string(k)+"/";
+		string fname=folder+c_parameters_filename;
+		std::ifstream inFile;
+		inFile.open(fname, std::ios_base::in);
+		double temp=0;
+		Vector param(dim-2,0);
+		//		std::cout<<"params: "<<k<<" ";
+		//		for(int d=0;d<dim-2;++d)
+		//		{
+		//			inFile>>temp;
+		//			param[d]=temp;
+		//			Ndata.params.push_back(param);
+		//			std::cout<<temp<<" ";
+		//		}
+		//TEMPORARY?
+		for(int d=0;d<dim-2;++d)
+		{
+			inFile>>temp;
+			if(d>=0)
+			{
+				param[d]=temp;
+
+				//				std::cout<<temp<<" ";
+			}
+		}
+		allParams.push_back(param);
+		//		std::cout<<"\n";
+		inFile.close();
+	}
+	//Rearrange parameters (fastest first)
+	int jump=1;//Ndata.A.m_matrix_size;
+	for(int d=2;d<dim;++d)
+	{
+		Vector v(Ndata.A.sizes()[d]);
+		for(int j=0;j<Ndata.A.sizes()[d];j++)
+		{
+			v[j]=allParams[j*jump][dim-1-(d)];
+		}
+		Ndata.params.push_back(v);
+		jump*=Ndata.A.sizes()[d];
+	}
+}
+//---------------------------------------------------------------------------------------------------
+
 //Makes sure parameters are sorted and files are read in right order
 //Creates EMPTY myMatrix
 
@@ -315,7 +366,7 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 	//+++++++++++++++++++++++++++
 	int spaceDegreOfFreedom=0;
 	int timeDegreOfFreedom=0;
-	string new_filename = foldername + string("/1/just.odb");
+	string new_filename = foldername + "/1/"+c_odb_filename;
 	readODB_SpacexTime(new_filename,spaceDegreOfFreedom,timeDegreOfFreedom);
 
 	intVector sizes(dim,0);
@@ -334,7 +385,7 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 	{
 
 		string folder=foldername+"/"+std::to_string(k)+"/";
-		string fname=folder+"just.odb";
+		string fname=folder+c_odb_filename;
 		readODB2(fname, M);
 		Ndata.A.setNext(M);
 		fname=folder+"params.dat";
@@ -436,7 +487,7 @@ void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, 
 }
 
 
-//Old .txt based input <---toooooooooo SLOW (but leave it here just in case)
+//Old .txt based input <---toooooooooo SLOW (but I leave it here just in case)
 //---------------------------------------------------------------------------------------------------
 
 
