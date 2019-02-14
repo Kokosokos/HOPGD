@@ -15,6 +15,8 @@
 
 using std::string;
 
+const string c_parameters_filename="params.dat";
+const string c_odb_filename="just.odb";
 
 
 class FileManager
@@ -26,13 +28,12 @@ public:
 
 	//Open snapshot dir,
 	//read @param1DegreOfFreedom@, @timeDegreOfFreedom@, @timeDegreOfFreedom@
-	void readFolder(string foldername);
+	void readFolder(string foldername, InputData& inData);
 	void readODB(string filename, Matrix& m);
-
-	void readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, int& timeDegreOfFreedom);
 
 	void readFolder(string foldername, NinputData3& Ndata, int dim, intVector sizes);
 	void readParams(string foldername, NinputData3& Ndata, int dim, intVector sizes);
+	void readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, int& timeDegreOfFreedom);
 	void readODB2(string filename, Matrix& m);
 
 	void write(string filename, const Matrix& m);
@@ -42,7 +43,7 @@ public:
 	bool loadModel(string dirPath, Model& model);
 	bool loadModel(string dirPath, NModel& model);
 
-	inputData inData;
+	;
 //  Old read from txt files
 //	void readFolderOld(string foldername);
 };

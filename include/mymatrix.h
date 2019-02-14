@@ -37,7 +37,7 @@ void opencv2blaze(const cv::Mat source, Matrix &dest);
 
 
 //Add copy operator?!
-struct inputData
+struct InputData
 {
 	//number of result files:
 	int		timeDegreOfFreedom;
@@ -49,9 +49,9 @@ struct inputData
 	Vector	param1;
 
 	Matrix* A;
-	inputData(){};
+	InputData(){};
 	void init(){A=new Matrix[param1DegreOfFreedom];};
-	~inputData(){ delete[] A;};
+	~InputData(){ delete[] A;};
 };
 
 

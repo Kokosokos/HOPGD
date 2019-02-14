@@ -25,9 +25,9 @@ public:
 	 * @brief 3 Dimensional HOPGD method. Creates model and saves it in CreateModes.model.
 	 * @param[in] inData input data structure
 	 * @param[in] nmax the maximum number of modes (500 by default)
-	 * @see inputData
+	 * @see InputData
 	 */
-	CreateModes(const inputData& inData,int nmax=500);
+	CreateModes(const InputData& inData,int nmax=500);
 
 	/**
 	 * @brief N Dimensional HOPGD method. Creates model and saves it in CreateModes.nmodel.

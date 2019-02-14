@@ -15,7 +15,7 @@ NDMatrix::NDMatrix(int dim, intVector sizes)
 	setSize(dim, sizes);
 
 }
-NDMatrix::NDMatrix(const inputData& data)
+NDMatrix::NDMatrix(const InputData& data)
 {
 
 	intVector sizes(3);
@@ -51,7 +51,7 @@ void NDMatrix::setSize(int dim, intVector sizes)
 	m_paramSize=m_totSize/m_matrix_size;
 	for(int i=0;i<m_paramSize;++i)
 	{
-			m_values.push_back(Matrix(m_sizes[0],m_sizes[1]));
+			m_values.push_back(Matrix(m_sizes[0],m_sizes[1],0));
 	}
 
 }
