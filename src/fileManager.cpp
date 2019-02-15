@@ -2,15 +2,15 @@
 #include <stdlib.h> /* strtof */
 #include "fileManager.h"
 //#include "NDMatrix.h"
+#include <odb_API.h>
 
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;
 #include <fstream>
-
 #include <iostream>
 #include <sstream>      // std::istringstream
-#include <odb_API.h>
-//using std::string;
+//---------------------------------------------------------------------------------------------------
+
 typedef blaze::DynamicVector<string,blaze::rowMajor> SVector;
 const int c_tmax=100;
 
@@ -51,6 +51,11 @@ double my_stod (std::string const& s) {
     return d;
 }
 
+//---------------------------------------------------------------------------------------------------
+FileManager::FileManager(){	odb_initializeAPI();}
+//---------------------------------------------------------------------------------------------------
+
+FileManager::~FileManager(){odb_finalizeAPI();}
 //---------------------------------------------------------------------------------------------------
 void FileManager::read(string filename, Matrix& m)
 {
@@ -96,10 +101,7 @@ void FileManager::write(string filename, const Matrix& m)
 	outFile.close();
 }
 
-FileManager::~FileManager()
-{
-	//delete[] inData.A;
-}
+
 //---------------------------------------------------------------------------------------------------
 
 void FileManager::saveModel(string dirPath, const NModel& model)
@@ -164,49 +166,53 @@ bool FileManager::loadModel(string dirPath, NModel& model)
 
 //---------------------------------------------------------------------------------------------------
 //Reads parameters
-void FileManager::readParams(string foldername, NinputData3& Ndata, int dim, intVector sizes)
+void FileManager::readParams(string foldername, int& dim, intVector& sizes,std::vector<Vector>& params)
 {
-	std::vector<Vector> allParams;
-	for (int k=1;k<Ndata.A.m_paramSize+1;++k)
+	std::ifstream inFile;
+	inFile.open(foldername+"/"+c_all_parameters_filename, std::ios_base::in);
+	std::string line;
+	dim=0;
+	while (std::getline(inFile, line))
 	{
-		string folder=foldername+"/"+std::to_string(k)+"/";
-		string fname=folder+c_parameters_filename;
-		std::ifstream inFile;
-		inFile.open(fname, std::ios_base::in);
-		double temp=0;
-		Vector param(dim-2,0);
+		dim++;
+	    std::istringstream iss(line);
+	    double temp;
+	    Vector p1;
+	    int s=0;
+	    while ((iss >> temp))
+	    {
 
-		for(int d=0;d<dim-2;++d)
-		{
-			inFile>>temp;
-			if(d>=0)
-			{
-				param[d]=temp;
-			}
-		}
-		allParams.push_back(param);
-		//		std::cout<<"\n";
-		inFile.close();
+	    	s++;
+	    	p1.resize(s,true);
+	    	p1[s-1]=temp;
+	    	std::cout << temp<<" ";
+	    } // error
+
+	    params.push_back(p1);
+	    std::cout <<"\n";
+	    // process pair (a,b)
 	}
-	//Rearrange parameters (fastest first)
-	int jump=1;//Ndata.A.m_matrix_size;
-	for(int d=2;d<dim;++d)
-	{
-		Vector v(Ndata.A.sizes()[d]);
-		for(int j=0;j<Ndata.A.sizes()[d];j++)
-		{
-			v[j]=allParams[j*jump][dim-1-(d)];
-		}
-		Ndata.params.push_back(v);
-		jump*=Ndata.A.sizes()[d];
-	}
+	sizes=intVector(dim);
+	for(int d=0;d<dim;++d)
+		sizes[d]=params[d].size();
+	inFile.close();
+
+}
+
+//---------------------------------------------------------------------------------------------------
+void FileManager::readFolder(string foldername, NinputData3& Ndata)
+{
+	int dim=0;						//dimensionality of the system
+	intVector paramSizes;			//the sizes of parameters dimensions
+//	std::vector<Vector> parameters;
+	readParams(foldername, dim, paramSizes, Ndata.params);
+
+	dim=dim+2;
+
+	readFolder( foldername, Ndata, dim, paramSizes );
 }
 //---------------------------------------------------------------------------------------------------
 
-//Makes sure parameters are sorted and files are read in right order
-//Creates EMPTY myMatrix
-
-//---------------------------------------------------------------------------------------------------
 void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, intVector param_sizes)
 {
 	//!SORT parameters array++++++++!!!
@@ -234,49 +240,9 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 
 		string folder=foldername+"/"+std::to_string(k)+"/";
 		string fname=folder+c_odb_filename;
+		std::cout<<fname<<std::endl;
 		readODB2(fname, M);
 		Ndata.A.setNext(M);
-		fname=folder+"params.dat";
-		std::ifstream inFile;
-		inFile.open(fname, std::ios_base::in);
-		double temp=0;
-		Vector param(dim-2,0);
-//		std::cout<<"params: "<<k<<" ";
-//		for(int d=0;d<dim-2;++d)
-//		{
-//			inFile>>temp;
-//			param[d]=temp;
-//			Ndata.params.push_back(param);
-//			std::cout<<temp<<" ";
-//		}
-		//TEMPORARY?
-		for(int d=0;d<dim-2;++d)
-		{
-			inFile>>temp;
-			if(d>=0)
-			{
-				param[d]=temp;
-
-//				std::cout<<temp<<" ";
-			}
-		}
-		allParams.push_back(param);
-//		std::cout<<"\n";
-		inFile.close();
-
-	}
-//	std::reverse(allParams.begin(), allParams.end());
-//	std::cout<<"1\n";
-	int jump=1;//Ndata.A.m_matrix_size;
-	for(int d=2;d<dim;++d)
-	{
-		Vector v(Ndata.A.sizes()[d]);
-		for(int j=0;j<Ndata.A.sizes()[d];j++)
-		{
-			v[j]=allParams[j*jump][dim-1-(d)];
-		}
-		Ndata.params.push_back(v);
-		jump*=Ndata.A.sizes()[d];
 	}
 	//--------------------------------------------
 
@@ -286,9 +252,6 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 
 void FileManager::readODB2(string filename, Matrix& m)
 {
-
-//	odb_initializeAPI();
-
 	odb_Odb& myOdb = openOdb(filename.c_str(), true);
 
 	odb_Step& step = myOdb.steps()["Step-1"];
@@ -311,7 +274,6 @@ void FileManager::readODB2(string filename, Matrix& m)
 
 	}
 	myOdb.close();
-//	odb_finalizeAPI();
 }
 //---------------------------------------------------------------------------------------------------
 void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, int& timeDegreOfFreedom)
