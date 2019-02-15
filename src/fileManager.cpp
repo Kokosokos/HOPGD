@@ -185,11 +185,11 @@ void FileManager::readParams(string foldername, int& dim, intVector& sizes,std::
 	    	s++;
 	    	p1.resize(s,true);
 	    	p1[s-1]=temp;
-	    	std::cout << temp<<" ";
+//	    	std::cout << temp<<" ";
 	    } // error
 
 	    params.push_back(p1);
-	    std::cout <<"\n";
+//	    std::cout <<"\n";
 	    // process pair (a,b)
 	}
 	sizes=intVector(dim);
@@ -240,10 +240,13 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, int
 
 		string folder=foldername+"/"+std::to_string(k)+"/";
 		string fname=folder+c_odb_filename;
-		std::cout<<fname<<std::endl;
+//		std::cout<<fname<<std::endl;
+		std::cout << "\r" << k << "/"<<Ndata.A.m_paramSize<<std::flush;
+//		std::cout.flush();
 		readODB2(fname, M);
 		Ndata.A.setNext(M);
 	}
+	std::cout<<"\rDone           "<<std::endl;
 	//--------------------------------------------
 
 //	std::cout<<"2\n";

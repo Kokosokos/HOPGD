@@ -40,15 +40,13 @@ void CreateModes::HOPGD( const NDMatrix& M, double ec)
 	NDMatrix R = M;
 	Vector *F;
 	F = new Vector[dim];
-
+	std::cout<<std::endl;
 	for (int n = 0; n < c_nmax; ++n)
 	{
 		double normBF = 1;
 		double prevNorm = 1;
 
 		double start,fin;
-//		std::cout<<n<<"\n";
-//		std::cout.flush();
 
 		if(R.dist(M) < ec )
 		{
@@ -67,6 +65,7 @@ void CreateModes::HOPGD( const NDMatrix& M, double ec)
 
 		for (int v = 0; v < c_vmax; ++v)
 		{
+			std::cout<< "\rn: " << n << "/"<<c_nmax<< "; v:" << v << "/"<<c_vmax<<"                "<<std::flush;
 			if(v == c_vmax-1)
 			{
 				std::cout<<"WARNING: inner loop v==vmax;"<<std::endl;
@@ -120,6 +119,7 @@ void CreateModes::HOPGD( const NDMatrix& M, double ec)
 
 
 	}
+	std::cout<<"\rDone       "<<std::endl;
 	delete[] F;
 	nmodel = model;
 
