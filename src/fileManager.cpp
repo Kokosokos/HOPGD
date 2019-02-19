@@ -215,7 +215,7 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata)
 
 void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, intVector param_sizes)
 {
-	//!SORT parameters array++++++++!!!
+	//SORT parameters array++++++++!!!
 //	vectorSort2(Ndata.params[0],sparam1);
 	//+++++++++++++++++++++++++++
 	int spaceDegreOfFreedom=0;

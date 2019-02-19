@@ -48,12 +48,17 @@ loop()
 
 inpName=$1 #template .inp filename
 echo "Preparation started"
-if [ $# -le 1 ]
+if [ $# -le 0 ]
 then
-        echo "ERROR: Please provide .inp template file and parameters file"
+        echo "ERROR: Please provide .inp template file"
         exit
 fi
-parametersFile=$2
+parametersFile="params.in" #$2
+if [ ! -f $parametersFile ]
+then
+	echo "ERROR: params.in file not found"
+    exit
+fi
 readarray arr < $parametersFile
 export k=0
 loop  

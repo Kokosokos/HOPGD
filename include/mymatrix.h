@@ -76,23 +76,36 @@ struct cvModel
 	Vector param1;
 };
 
+/**
+ * @brief The ND model container
+ */
 struct NModel
 {
+	/**
+	 * @brief The number of modes in the model
+	 */
 	int nbrModes;
-	int dim;
-//	Matrix* F; //size dim
-//	NModel(int d){dim=d; F=new Matrix[dim];nbrModes=0;};
-//	~NModel(){delete[] F;};
 
+
+	/**
+	 * @brief  Dimensionality.
+	 */
+	int dim;
+
+	/**
+	 * @brief The vector that stores the basis. n-th column of the F[k] - is the n-th mode of the k-th dimension basis.
+	 */
 	std::vector<Matrix> F;
-	Vector param1;
-//	Vector* params; //must be Vector *params
+	/**
+	 * @brief The vector that stores the snapshots parameters on which the model was build.
+	 */
 	std::vector<Vector> params;
 	NModel(){};
 	NModel(int d){dim=d; F=std::vector<Matrix>(dim);nbrModes=0;};
-//	NModel operator = (NModel nm){ NModel temp(dim); temp.nbrModes=nm.nbrModes;for (int i=0;i<dim;++i)temp.F[i]=nm.F[i];return temp;};
-
 };
+/**
+ * @brief  The ND model container Same as NModel but uses cv::Mat for storing models basis.
+ */
 struct cvNModel
 {
 	int nbrModes;

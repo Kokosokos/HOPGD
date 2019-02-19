@@ -13,7 +13,7 @@
 //typedef blaze::DynamicVector<Matrix,blaze::rowMajor> MVector;
 
 /**
- * A model creation class. Creates, stores and uses the model to fit new parameters.
+ * @brief  A model creation class. Creates, stores and uses the model to fit new parameters.
  */
 class CreateModes
 {

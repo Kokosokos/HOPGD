@@ -1,0 +1,18 @@
+/*! \mainpage 
+ *
+ * \section intro_sec Introduction
+ *
+ * Melted is the project that implements N-dimensional High Order Proper Generalized Decomposition (HOPGD).
+ *
+ * \section install_sec Requirements
+ * <pre>
+ * Libriaries:
+ * 	<a href="https://docs.opencv.org/3.4/d1/dfb/intro.html">OpenCV</a>
+ * 	<a href="https://bitbucket.org/blaze-lib/blaze/src/master/">Blaze</a>
+ *	<a href="https://www.sharcnet.ca/Software/Abaqus610/Documentation/docs/v6.10/books/ker/default.htm?startat=pt02ch57.html">Abaqus OdbApi</a>
+ * </pre>
+ * \section usage_sec How to use.
+ * 
+ *
+ * etc...
+ */
