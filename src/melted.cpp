@@ -23,6 +23,9 @@ using namespace std;
 namespace po = boost::program_options;
 
 
+#include <sys/stat.h> //to check if folder exists
+struct stat info;
+
 int main(int argc, char * argv[])
 {
 	// process arguments
@@ -117,7 +120,9 @@ int main(int argc, char * argv[])
 		cv::Mat res;
 		res.create(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows(),opencvMatrixType);
 
-		for(int i=1;i<=4;++i)
+		int i=1;
+//		for(int i=1;i<=4;++i)
+		while(stat((validationFolder+"/"+std::to_string(i)).c_str(), &info) == 0)
 		{
 			string filename=validationFolder+"/"+std::to_string(i)+"/"+c_odb_filename;//<--odb_filename defined in
 			cout<<filename<<endl;
@@ -139,26 +144,34 @@ int main(int argc, char * argv[])
 
 			inFile.close();
 			start = omp_get_wtime();
-			modesCreator3.fitNewND(param,Mfit);
-			fin=omp_get_wtime()-start;
+			cout<<"params: "<<blaze::trans(param)<<endl;
+			if(modesCreator3.fitNewND(param,Mfit))
+			{
+				fin=omp_get_wtime()-start;
 
-			double err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
+				double err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
 
-			cout<<blaze::trans(param)<<" : OMP: error: "<<err<<"%; time = "<<fin<<" sec;";
-			fprintf (outFile, "%d %f %lf ", i, err, fin );
+				cout<<"OMP: error: "<<err<<"%; time = "<<fin<<" sec;";
+				fprintf (outFile, "%d %f %lf ", i, err, fin );
 
-			start = omp_get_wtime();
-			modesCreator3.fitNewNDCuda(param,res);
-			fin = omp_get_wtime()-start;
+				start = omp_get_wtime();
+				modesCreator3.fitNewNDCuda(param,res);
+				fin = omp_get_wtime()-start;
 
-			opencv2blaze(res,Mfit);
+				opencv2blaze(res,Mfit);
 
-			err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
-			std::cout<<" CUDA: error="<<err<<"%; time = "<<fin  << " sec"<<std::endl;
-			fprintf (outFile, "%f %lf\n", err, fin );
-
+				err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
+				std::cout<<" CUDA: error="<<err<<"%; time = "<<fin  << " sec"<<std::endl;
+				fprintf (outFile, "%f %lf\n", err, fin );
+			}
+			else
+			{
+				fprintf (outFile, "%d Enrichment is needed\n",i );
+			}
+			i++;
 		}
 		fclose (outFile);
+
 	}
 	// VALIDATION
 

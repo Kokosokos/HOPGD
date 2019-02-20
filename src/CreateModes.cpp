@@ -216,14 +216,14 @@ void CreateModes::create(const NinputData3& input)
 }
 
 //---------------------------------------------------------------------------------------------------
-void CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
+bool CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
 {
 
 		Vector Vinter(nmodel.nbrModes,1);
 		for(int d = 2; d < nmodel.dim; ++d)
 		{
 			int idx = searchUpperNearest(nmodel.params[d - 2], newParam1[d - 2]);
-			if( idx >= 0 && idx < nmodel.params[d - 2].size())
+			if( (idx > 0 && idx < nmodel.params[d - 2].size()) || (idx ==0 && newParam1==nmodel.params[d-2][idx]))
 			{
 				int idxlow=idx==0?idx:idx-1;
 				Vector low=column(trans(nmodel.F[d]),idxlow);
@@ -245,6 +245,7 @@ void CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
 			else
 			{
 				std::cout<<"Enrichment is needed\n";
+				return false;
 			}
 		}
 		result.resize(nmodel.F[0].rows(),nmodel.F[1].rows(),false);
@@ -258,7 +259,7 @@ void CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
 			column(F1temp,mode)=temp*column(F1temp,mode);
 		}
 		result=nmodel.F[0]*trans(F1temp);
-
+		return true;
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -302,14 +303,14 @@ void CreateModes::cudaInitND(int nModes)
 
 //---------------------------------------------------------------------------------------------------
 
-void CreateModes::fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const
+bool CreateModes::fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const
 {
 
 		Vector Vinter(nmodel.nbrModes,1);
 		for(int d=2;d<nmodel.dim;++d)
 		{
 			int idx=searchUpperNearest(nmodel.params[d-2],newParam1[d-2]);
-			if( idx >= 0 && idx < nmodel.params[d-2].size())
+			if( (idx > 0 && idx < nmodel.params[d-2].size()) || (idx ==0 && newParam1==nmodel.params[d-2][idx]))
 			{
 				int idxlow=idx==0?idx:idx-1;
 				Vector low=column(trans(nmodel.F[d]),idxlow);
@@ -331,6 +332,7 @@ void CreateModes::fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const
 			else
 			{
 				std::cout<<"Enrichment is needed\n";
+				return false;
 			}
 		}
 
@@ -351,4 +353,5 @@ void CreateModes::fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const
 		cv::cuda::GpuMat gres;
 		cv::cuda::gemm(gf1, gf2, 1.0, cv::cuda::GpuMat(), 0.0, gres);
 		gres.download(result);
+		return true;
 }
