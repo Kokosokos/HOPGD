@@ -68,7 +68,7 @@ for d in */
 do
         i=1
         cd $d
-        cp ../128320_4params_template.inp just.inp
+        cp ../$1 just.inp
         p=$(cat params.dat)
         p=($p)
         for p1 in ${p[@]};
@@ -78,5 +78,6 @@ do
         done 
         cd ..
 done
+mkdir model
 echo "Preparation finished"
 

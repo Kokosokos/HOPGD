@@ -18,16 +18,9 @@
 class CreateModes
 {
 public:
-	CreateModes():c_nmax(500),m_ifCudaInit(false)
+	CreateModes():m_nmax(500),m_ifCudaInit(false)
 	{
 	}
-	/**
-	 * @brief 3 Dimensional HOPGD method. Creates model and saves it in CreateModes.model.
-	 * @param[in] inData input data structure
-	 * @param[in] nmax the maximum number of modes (500 by default)
-	 * @see InputData
-	 */
-	CreateModes(const InputData& inData,int nmax=500);
 
 	/**
 	 * @brief N Dimensional HOPGD method. Creates model and saves it in CreateModes.nmodel.
@@ -38,25 +31,11 @@ public:
 
 
 	/**
-	 * @brief 3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses triple nested loop, very slow.
-	 * @param[in] newParam1 Parameters value.
-	 * @param[out] result The resulting approximation.
+	 * @brief N Dimensional HOPGD method. Recreates model and saves it in CreateModes.nmodel.
+	 * @param[in] input input data structure
+	 * @see NinputData3
 	 */
-	void fitNew_Loops(const double& newParam1, Matrix& result) const;
-	/**
-	 * @brief 3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses vectors/matrix operations instead of triple loop.
-	 * @param[in] newParam1 Parameters value.
-	 * @param[out] result The resulting approximation.
-	 */
-	void fitNew(const double& newParam1, Matrix& result) const;
-	/**
-	* @brief 3 Dimensional method that uses the model to produce the approximated result for a new parameter.
-	* Uses vectors/matrix operations instead of triple loop. Uses limited number of modes.
-	* @param[in] newParam1 Parameters value.
-	* @param[out] result The resulting approximation.
-	* @param[in] nModes Specifies the maximum number of modes used in approximation.
-	*/
-	void fitNew(const double& newParam1, Matrix& result, int nModes) const;
+	void create(const NinputData3& input);
 
 	/**
 	 * @brief N Dimensional method that uses the model to produce the approximated result for a new parameter.
@@ -65,27 +44,12 @@ public:
 	 */
 	void fitNewND(const Vector& newParam1, Matrix& result) const;
 
-
-
-	/**
-	 * @brief 3 Dimensional cuda initialization routine. Copies model to cvmodel.
-	 * @param[in] nModes Specifies the maximum number of modes used in approximation. Default =-1: use the same number of modes as in model.
-	 */
-	void cudaInit(int nModes=-1);
-
 	/**
 	 * @brief N Dimensional cuda initialization routine.  Copies nmodel to cvnmodel.
 	 * @param[in] nModes Specifies the maximum number of modes used in approximation. Default =-1: use the same number of modes as in model.
 	 */
 	void cudaInitND(int nModes=-1);
 
-	/**
-	 * @brief 3 Dimensional method that uses the model to produce the approximated result for a new parameter.
-	 * Uses openCV::Cuda for matrix-matrix multiplication.
-	 * @param[in] newParam1 Parameters value.
-	 * @param[out] result The resulting approximation stored in opencv::Mat class.
-	 */
-	void fitNewCuda(const double& newParam1, cv::Mat &result) const;
 	/**
 	 * @brief N Dimensional method that uses the model to produce the approximated result for a new parameter.
 	 * Uses openCV::Cuda for matrix-matrix multiplication.
@@ -94,17 +58,6 @@ public:
 	 */
 	void fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const;
 
-
-
-
-	/**
-	 * The 3D model structure.
-	 */
-	Model model;
-	/**
-	 * The 3D model structure that uses opencv::Mat.
-	 */
-	cvModel cvmodel;
 	/**
 	 * The ND model structure that uses opencv::Mat.
 	 */
@@ -135,7 +88,7 @@ private:
 	/**
 	 * The maximum number of modes used in model.
 	 */
-	const int c_nmax;
+	int m_nmax;
 	bool m_ifCudaInit;
 };
 
