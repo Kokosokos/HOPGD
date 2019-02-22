@@ -216,7 +216,7 @@ void CreateModes::create(const NinputData3& input)
 }
 
 //---------------------------------------------------------------------------------------------------
-bool CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
+bool CreateModes::fitNewND(const Vector& newParam1, Matrix& result, int nModes) const
 {
 
 		Vector Vinter(nmodel.nbrModes,1);
@@ -251,14 +251,14 @@ bool CreateModes::fitNewND(const Vector& newParam1, Matrix& result) const
 		result.resize(nmodel.F[0].rows(),nmodel.F[1].rows(),false);
 		result=0;
 		Matrix result2=result;
-		Matrix F1temp=nmodel.F[1];
+		Matrix F1temp=submatrix(nmodel.F[1],0,0,nmodel.F[1].rows(),nModes);//nmodel.F[1];
 
-		for(uint mode=0;mode<nmodel.nbrModes;++mode)
+		for(uint mode=0;mode<nModes;++mode)
 		{
 			double temp=Vinter[mode];
 			column(F1temp,mode)=temp*column(F1temp,mode);
 		}
-		result=nmodel.F[0]*trans(F1temp);
+		result=submatrix(nmodel.F[0],0,0,nmodel.F[0].rows(),nModes)*trans(F1temp);
 		return true;
 }
 
@@ -284,7 +284,7 @@ void CreateModes::cudaInitND(int nModes)
 		for(int d=0;d<cvnmodel.dim;++d)
 			blaze2opencv(submatrix(nmodel.F[d],0,0,nmodel.F[d].rows(),nModes),cvnmodel.F[d]);
 	}
-
+	cvnmodel.nbrModes=nModes;
 	int CudaDevice = cv::cuda::getDevice();
 	cv::cuda::setDevice(CudaDevice);
 	cv::Mat m = cv::Mat::ones(rows, cols, opencvMatrixType);
@@ -303,7 +303,7 @@ void CreateModes::cudaInitND(int nModes)
 
 //---------------------------------------------------------------------------------------------------
 
-bool CreateModes::fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const
+bool CreateModes::fitNewNDCuda(const Vector& newParam1, cv::Mat &result, int nModes) const
 {
 
 		Vector Vinter(nmodel.nbrModes,1);
@@ -338,7 +338,7 @@ bool CreateModes::fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const
 
 		cv::Mat F1temp=cvnmodel.F[1].clone();
 
-		for(uint mode=0;mode<nmodel.nbrModes;++mode)
+		for(uint mode=0;mode<cvnmodel.nbrModes;++mode)
 		{
 			double temp=Vinter[mode];
 			F1temp.col(mode)=temp*F1temp.col(mode);

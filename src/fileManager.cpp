@@ -13,7 +13,8 @@ using namespace boost::filesystem;
 
 typedef blaze::DynamicVector<string,blaze::rowMajor> SVector;
 const int c_tmax=100;
-
+const string c_field_string="NT11";
+const string c_step_name="Step-1";
 //---------------------------------------------------------------------------------------------------
 class sort_indices
 {
@@ -257,13 +258,16 @@ void FileManager::readODB2(string filename, Matrix& m)
 {
 	odb_Odb& myOdb = openOdb(filename.c_str(), true);
 
-	odb_Step& step = myOdb.steps()["Step-1"];
+//	odb_Step& step = myOdb.steps()[c_step_name];
+	odb_String stepName(c_step_name.c_str(),c_step_name.size());
+	odb_StepRepository& steps = myOdb.steps();
+	odb_Step& step = steps[stepName];
 	odb_SequenceFrame& allFramesInStep = step.frames();
 
 	for(int timeID =0;timeID<m.columns();++timeID)
 	{
 		const odb_SequenceFieldValue& temp =
-				allFramesInStep[timeID].fieldOutputs()["NT11"].values();
+				allFramesInStep[timeID].fieldOutputs()[c_field_string.c_str()].values();
 		int numComp = 0;
 		for (int spaceID=0; spaceID<m.rows(); spaceID++)
 		{
@@ -285,7 +289,7 @@ void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, 
 //
 	odb_Odb& myOdb = openOdb(filename.c_str(), true);
 	odb_StepRepository& steps = myOdb.steps();
-	odb_String stepName("Step-1",6);
+	odb_String stepName(c_step_name.c_str(),c_step_name.size());
 	odb_Step& step = steps[stepName];
 
 //	odb_Step& step = myOdb.steps()["Step-1"];
@@ -293,7 +297,7 @@ void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, 
 	int numFrames = allFramesInStep.size();
 	numFrames=c_tmax;
 	timeDegreOfFreedom=numFrames;
-	int numValues = allFramesInStep[numFrames-1].fieldOutputs()["NT11"].values().size();
+	int numValues = allFramesInStep[numFrames-1].fieldOutputs()[c_field_string.c_str()].values().size();
 	spaceDegreOfFreedom=numValues;
 	myOdb.close();
 //	odb_finalizeAPI();

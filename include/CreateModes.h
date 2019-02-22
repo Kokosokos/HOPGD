@@ -42,7 +42,7 @@ public:
 	 * @param[in] newParam1 The vector of the parameters values.
 	 * @param[out] result The resulting approximation.
 	 */
-	bool fitNewND(const Vector& newParam1, Matrix& result) const;
+	bool fitNewND(const Vector& newParam1, Matrix& result, int nModes) const;
 
 	/**
 	 * @brief N Dimensional cuda initialization routine.  Copies nmodel to cvnmodel.
@@ -56,7 +56,7 @@ public:
 	 * @param[in] newParam1 The vector of the parameters values.
 	 * @param[out] result The resulting approximation stored in opencv::Mat class.
 	 */
-	bool fitNewNDCuda(const Vector& newParam1, cv::Mat &result) const;
+	bool fitNewNDCuda(const Vector& newParam1, cv::Mat &result, int nModes) const;
 
 	/**
 	 * The ND model structure that uses opencv::Mat.

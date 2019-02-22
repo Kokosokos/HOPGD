@@ -15,7 +15,8 @@ using std::string;
 //The 1 snapshot parameters file name.
 const string c_parameters_filename="params.dat";
 //The parameters file name for multiple snapshots.
-const string c_all_parameters_filename="params.in";
+const string c_all_parameters_filename=""
+		"params.in";
 //The .odb file name.
 const string c_odb_filename="just.odb";
 

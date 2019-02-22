@@ -33,13 +33,18 @@ int main(int argc, char * argv[])
 	po::options_description desc("Allowed options");
 	bool createModelFlag = false;
 	bool validationFlag  = false;
+	int nmbrModes=20;				//maximum number of modes used
+	int nthreads = 8;				//number of threads for openmp blaze-lib parallelization
+
 	string validationFolder;
 
 	desc.add_options()
 		    						("help", "produce help message")
 		    						("create_model,c", po::bool_switch(&createModelFlag)->default_value(false), "creates model and stores it in \'model\' folder")
-		    						("validation,v",po::bool_switch(&validationFlag)->default_value(false), "runs the model validation routine. Validation folder name must be provided with -vfolder")
+		    						("validation,v",po::bool_switch(&validationFlag)->default_value(false), "runs the model validation routine. Validation folder name must be provided with --vfolder")
 		    						("vfolder",po::value<string>(&validationFolder), "The folder name of validation snapshots.")
+		    						("nmax",po::value<int>(&nmbrModes)->default_value(20), "The maximum number of modes in the model (default = 20).")
+		    						("nthreads",po::value<int>(&nthreads)->default_value(8), "The number of cores used by openmp (default = 8).")
 		    						;
 
 	po::variables_map vm;
@@ -57,7 +62,6 @@ int main(int argc, char * argv[])
 		return 1;
 	}
 
-	int nthreads = 8;				//number of threads for openmp blaze-lib parallelization
 	blaze::setNumThreads( nthreads );
 	FileManager file_manager;		//input files reader class
 	CreateModes modesCreator3;//(nData);
@@ -79,7 +83,7 @@ int main(int argc, char * argv[])
 		std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
 
 		nData.error 	= 0.001;		//Model precision
-		nData.nModesMax = 20;			//Maximum number of modes
+		nData.nModesMax = nmbrModes;			//Maximum number of modes
 
 		std::cout<<"Creating model: ";
 		start = omp_get_wtime();
@@ -98,9 +102,13 @@ int main(int argc, char * argv[])
 		file_manager.loadModel(modelFolder, modesCreator3.nmodel);
 	}
 
+	if(nmbrModes > modesCreator3.nmodel.nbrModes)
+	{
+		cout<<"Warning: Too large nmax. nmax is set to a number of modes in the model (" <<modesCreator3.nmodel.nbrModes<<")\n";
+		nmbrModes = modesCreator3.nmodel.nbrModes;
+	}
 	if (validationFlag)
 	{
-		int nmbrModes=20;
 		int dim=modesCreator3.nmodel.dim;
 //		string validationFolder="/home/ikriuchevs/workspace/melted/tests/Ndim/Validation/";
 		Matrix M(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows());
@@ -110,11 +118,13 @@ int main(int argc, char * argv[])
 		double fin;
 
 		FILE * outFile;
-		string outFileName=validationFolder+"/nmax"+std::to_string( modesCreator3.nmodel.nbrModes)+".omp"+std::to_string(nthreads)+".dat";
+		string outFileName=validationFolder+"/nmax"+std::to_string(nmbrModes)+".omp"+std::to_string(nthreads)+".dat";
 		outFile = fopen(outFileName.c_str(), "w");
 		fprintf (outFile, "#nbr of modes = %d\n",modesCreator3.nmodel.nbrModes);
 		fprintf (outFile, "#Folder Error Time CudaError CudaTime\n");
+
 		blaze::setNumThreads( nthreads );
+
 		//CUDA
 		modesCreator3.cudaInitND(nmbrModes);
 		cv::Mat res;
@@ -144,29 +154,29 @@ int main(int argc, char * argv[])
 
 			inFile.close();
 			start = omp_get_wtime();
-			cout<<"params: "<<blaze::trans(param)<<endl;
-			if(modesCreator3.fitNewND(param,Mfit))
+			cout<<"params: "<<blaze::trans(param);
+			if(modesCreator3.fitNewND(param,Mfit, nmbrModes))
 			{
 				fin=omp_get_wtime()-start;
 
 				double err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
 
-				cout<<"OMP: error: "<<err<<"%; time = "<<fin<<" sec;";
+				cout<<"OMP: error = "<<err<<"%; time = "<<fin<<" sec;";
 				fprintf (outFile, "%d %f %lf ", i, err, fin );
 
 				start = omp_get_wtime();
-				modesCreator3.fitNewNDCuda(param,res);
+				modesCreator3.fitNewNDCuda(param,res,nmbrModes);
 				fin = omp_get_wtime()-start;
 
 				opencv2blaze(res,Mfit);
 
 				err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
-				std::cout<<" CUDA: error="<<err<<"%; time = "<<fin  << " sec"<<std::endl;
+				std::cout<<" CUDA: error = "<<err<<"%; time = "<<fin  << " sec"<<endl<<endl;
 				fprintf (outFile, "%f %lf\n", err, fin );
 			}
 			else
 			{
-				fprintf (outFile, "%d Enrichment is needed\n",i );
+				fprintf (outFile, "%d Enrichment is needed\n\n",i );
 			}
 			i++;
 		}
