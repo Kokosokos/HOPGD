@@ -100,9 +100,6 @@ public:
 	 */
 	bool loadModel(string dirPath, NModel& model);
 
-	;
-//  Old read from txt files
-//	void readFolderOld(string foldername);
 };
 
 

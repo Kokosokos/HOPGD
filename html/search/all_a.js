@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['savemodel',['saveModel',['../classFileManager.html#a85ef8feb8cfd00a030baeee9f3348ca9',1,'FileManager']]],
-  ['setsize',['setSize',['../classNDMatrix.html#abdae365d88af34373cd95876c7b3f85e',1,'NDMatrix']]],
-  ['sizes',['sizes',['../classNDMatrix.html#a597cc4473dbc12ae0ed012369584188d',1,'NDMatrix']]]
+  ['params',['params',['../structNModel.html#acb8deaa60bf966cc2fea5ab8cc6025ed',1,'NModel::params()'],['../structNinputData3.html#a838bada5daf1b81115df23adcbc51461',1,'NinputData3::params()']]]
 ];

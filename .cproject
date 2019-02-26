@@ -27,7 +27,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/melted/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
 									<listOptionValue builtIn="false" value="/usr/local/include/opencv4"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/opencv4/opencv2"/>
+									<listOptionValue builtIn="false" value=""/>
 									<listOptionValue builtIn="false" value="/usr/include/boost"/>
 									<listOptionValue builtIn="false" value="/opt/abaqus/6.14-5/code/include"/>
 								</option>
@@ -49,6 +49,7 @@
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.160400093" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.815855078" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="opencv_core"/>
+									<listOptionValue builtIn="false" value="boost_system"/>
 									<listOptionValue builtIn="false" value="boost_program_options"/>
 									<listOptionValue builtIn="false" value="ABQSMAOdbApi"/>
 									<listOptionValue builtIn="false" value="ABQSMAOdbCore"/>
@@ -79,26 +80,11 @@
 									<listOptionValue builtIn="false" value="ABQSMAIofCore"/>
 									<listOptionValue builtIn="false" value="ABQSMAOdbDdbOdb"/>
 									<listOptionValue builtIn="false" value="opencv_cudaarithm"/>
-									<listOptionValue builtIn="false" value="opencv_imgproc"/>
-									<listOptionValue builtIn="false" value="opencv_highgui"/>
-									<listOptionValue builtIn="false" value="opencv_ml"/>
-									<listOptionValue builtIn="false" value="opencv_video"/>
-									<listOptionValue builtIn="false" value="opencv_features2d"/>
-									<listOptionValue builtIn="false" value="opencv_calib3d"/>
-									<listOptionValue builtIn="false" value="opencv_objdetect"/>
-									<listOptionValue builtIn="false" value="cudart"/>
-									<listOptionValue builtIn="false" value="boost_filesystem"/>
 									<listOptionValue builtIn="false" value="gomp"/>
 									<listOptionValue builtIn="false" value="pthread"/>
-									<listOptionValue builtIn="false" value="boost_system"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.53492132" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="/usr/lib/"/>
-									<listOptionValue builtIn="false" value="/opt/abaqus/6.14-5/code/bin"/>
-									<listOptionValue builtIn="false" value="/opt/abaqus/6.14-5/code/lib/"/>
-									<listOptionValue builtIn="false" value="/usr/local/lib/"/>
-									<listOptionValue builtIn="false" value="/usr/local/cuda/lib64"/>
-									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/"/>
+									<listOptionValue builtIn="false" value="/opt/abaqus/6.14-5/code/bin/"/>
 								</option>
 								<option id="gnu.cpp.link.option.flags.1837306671" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-fopenmp" valueType="string"/>
 								<option id="gnu.cpp.link.option.shared.2006724594" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" value="false" valueType="boolean"/>

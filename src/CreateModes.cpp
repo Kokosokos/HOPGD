@@ -28,41 +28,51 @@ int searchUpperNearest(const Vector& p,double v)
 
 void CreateModes::HOPGD( const NDMatrix& M, double ec)
 {
-	double start,fin;
-
-
 	intVector sizes = M.sizes();
 	int dim = M.dimensionality();
 
 	NModel model(dim);
 
+	//~f^n - n-th mode of approximation. M = sum over n of f^n
 	NDMatrix f(dim, sizes);
+
+	//Residuals matrix
 	NDMatrix R = M;
+
+	//"Unknown functions of n-th mode". f^n = F[0] * F[1] * ....
 	Vector *F;
 	F = new Vector[dim];
 	std::cout<<std::endl;
+	//Loop over modes
 	for (int n = 0; n < m_nmax; ++n)
 	{
+		// The product of all F norms except one
+		// normBF = ||F[0]||*...||F[m-1]||*||F[m+1]||*...*||F[N]||
 		double normBF = 1;
+		// Squared  F Norm of the previous iteration: ||F[m-1]||
 		double prevNorm = 1;
 
-		double start,fin;
-
+		// Convergence check. If the "distance" between R and M is small -> exit
 		if(R.dist(M) < ec )
 		{
 			break;
 		}
 
-		Vector bta1 = Vector(dim,0);
-		Vector br1  = Vector(dim,1);
+		// The norms of the F[m]
+		// Current step norm
 		Vector bt1  = Vector(dim,0);
+		// Previous step norm
+		Vector bta1 = Vector(dim,0);
+		// 1st step norm
+		Vector br1  = Vector(dim,1);
 
+		//Set initial values
 		for(int d = 0; d < dim; ++d)
 		{
 			F[d] = Vector(sizes[d], 1);
 			normBF *= blaze::sqrNorm(F[d]);
 		}
-
+		//Converge n-th mode
 		for (int v = 0; v < c_vmax; ++v)
 		{
 			std::cout<< "\rn: " << n << "/"<<m_nmax<< "; v:" << v << "/"<<c_vmax<<"                "<<std::flush;
@@ -73,15 +83,19 @@ void CreateModes::HOPGD( const NDMatrix& M, double ec)
 
 			bool e1 = true;
 
+			//Loop over dimensions
 			for(int m = 0; m < dim; ++m)
 			{
-
+				// Squared F Norm of the current iteration: ||F_{m-1}||^2
 				double currNorm = blaze::sqrNorm(F[m]);
 				normBF /= currNorm;
 				normBF *= prevNorm;
+
+				//Finds F[m] assuming that all the rest F[k] (k!=m) are known.
 				findF(m,R,F);
 				F[m] = F[m] / normBF;
 
+				// Recalculate the norm of updated F[m]
 				bt1[m]   = blaze::norm(F[m]);
 				prevNorm = bt1[m]*bt1[m];
 
@@ -90,21 +104,25 @@ void CreateModes::HOPGD( const NDMatrix& M, double ec)
 					br1[m] = bt1[m];
 				}
 
+				//Convergence criterion of n-th mode
 				e1 = e1 && ((bt1[m] - bta1[m]) / br1[m] < c_eBc);
 			}
 
 			if(e1)
 			{
+				//Calculates f from all F[m]. f = F[0] * F[1] * ....
 				findApprox(f, F);
 
+				//Update residuals
 				R = R - f;
-				//				fna=fna+f;
 
+				// Save all F[m] of the n-th mode in the model container
 				for(int m = 0; m < dim; ++m)
 				{
 					model.F[m].resize(F[m].size(), model.nbrModes + 1);
 					column(model.F[m], model.nbrModes) = F[m];
 				}
+
 				model.nbrModes++;
 
 

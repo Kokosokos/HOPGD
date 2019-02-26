@@ -82,43 +82,24 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ac0d6c45f5a250706fa2d2e6b3d8c60a7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#ac0d6c45f5a250706fa2d2e6b3d8c60a7">CreateModes</a> (const InputData &amp;inData, int nmax=500)</td></tr>
-<tr class="memdesc:ac0d6c45f5a250706fa2d2e6b3d8c60a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">3 Dimensional HOPGD method. Creates model and saves it in <a class="el" href="classCreateModes.html#a924e820c21de622e0022e92b8949e02f">CreateModes.model</a>.  <a href="#ac0d6c45f5a250706fa2d2e6b3d8c60a7">More...</a><br /></td></tr>
-<tr class="separator:ac0d6c45f5a250706fa2d2e6b3d8c60a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a073ea1c2100fcedb592615c91ca8a668"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#a073ea1c2100fcedb592615c91ca8a668">CreateModes</a> (const NinputData3 &amp;input)</td></tr>
+<tr class="memitem:a073ea1c2100fcedb592615c91ca8a668"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#a073ea1c2100fcedb592615c91ca8a668">CreateModes</a> (const <a class="el" href="structNinputData3.html">NinputData3</a> &amp;input)</td></tr>
 <tr class="memdesc:a073ea1c2100fcedb592615c91ca8a668"><td class="mdescLeft">&#160;</td><td class="mdescRight">N Dimensional HOPGD method. Creates model and saves it in <a class="el" href="classCreateModes.html#adabc757ed567867cd4effda61e706a66">CreateModes.nmodel</a>.  <a href="#a073ea1c2100fcedb592615c91ca8a668">More...</a><br /></td></tr>
 <tr class="separator:a073ea1c2100fcedb592615c91ca8a668"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad89e93277a54080207eb3769129ef8b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#ad89e93277a54080207eb3769129ef8b5">fitNew_Loops</a> (const double &amp;newParam1, Matrix &amp;result) const</td></tr>
-<tr class="memdesc:ad89e93277a54080207eb3769129ef8b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses triple nested loop, very slow.  <a href="#ad89e93277a54080207eb3769129ef8b5">More...</a><br /></td></tr>
-<tr class="separator:ad89e93277a54080207eb3769129ef8b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad402b42e41398d7b043219af582ea6c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#ad402b42e41398d7b043219af582ea6c9">fitNew</a> (const double &amp;newParam1, Matrix &amp;result) const</td></tr>
-<tr class="memdesc:ad402b42e41398d7b043219af582ea6c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses vectors/matrix operations instead of triple loop.  <a href="#ad402b42e41398d7b043219af582ea6c9">More...</a><br /></td></tr>
-<tr class="separator:ad402b42e41398d7b043219af582ea6c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5dfa9adc4f96a9fccb90d272a7cff041"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#a5dfa9adc4f96a9fccb90d272a7cff041">fitNew</a> (const double &amp;newParam1, Matrix &amp;result, int nModes) const</td></tr>
-<tr class="memdesc:a5dfa9adc4f96a9fccb90d272a7cff041"><td class="mdescLeft">&#160;</td><td class="mdescRight">3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses vectors/matrix operations instead of triple loop. Uses limited number of modes.  <a href="#a5dfa9adc4f96a9fccb90d272a7cff041">More...</a><br /></td></tr>
-<tr class="separator:a5dfa9adc4f96a9fccb90d272a7cff041"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeaca95e656d5be4473acc1ddf446bb59"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#aeaca95e656d5be4473acc1ddf446bb59">fitNewND</a> (const Vector &amp;newParam1, Matrix &amp;result) const</td></tr>
-<tr class="memdesc:aeaca95e656d5be4473acc1ddf446bb59"><td class="mdescLeft">&#160;</td><td class="mdescRight">N Dimensional method that uses the model to produce the approximated result for a new parameter.  <a href="#aeaca95e656d5be4473acc1ddf446bb59">More...</a><br /></td></tr>
-<tr class="separator:aeaca95e656d5be4473acc1ddf446bb59"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2d60d8b0025ddd86d2079a555344747"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#ac2d60d8b0025ddd86d2079a555344747">cudaInit</a> (int nModes=-1)</td></tr>
-<tr class="memdesc:ac2d60d8b0025ddd86d2079a555344747"><td class="mdescLeft">&#160;</td><td class="mdescRight">3 Dimensional cuda initialization routine. Copies model to cvmodel.  <a href="#ac2d60d8b0025ddd86d2079a555344747">More...</a><br /></td></tr>
-<tr class="separator:ac2d60d8b0025ddd86d2079a555344747"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acda042dab900b709e859372d7399f53d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#acda042dab900b709e859372d7399f53d">create</a> (const <a class="el" href="structNinputData3.html">NinputData3</a> &amp;input)</td></tr>
+<tr class="memdesc:acda042dab900b709e859372d7399f53d"><td class="mdescLeft">&#160;</td><td class="mdescRight">N Dimensional HOPGD method. Recreates model and saves it in <a class="el" href="classCreateModes.html#adabc757ed567867cd4effda61e706a66">CreateModes.nmodel</a>.  <a href="#acda042dab900b709e859372d7399f53d">More...</a><br /></td></tr>
+<tr class="separator:acda042dab900b709e859372d7399f53d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf735873bfb5ed0c4267ef4e84ac6096"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#abf735873bfb5ed0c4267ef4e84ac6096">fitNewND</a> (const Vector &amp;newParam1, Matrix &amp;result, int nModes) const</td></tr>
+<tr class="memdesc:abf735873bfb5ed0c4267ef4e84ac6096"><td class="mdescLeft">&#160;</td><td class="mdescRight">N Dimensional method that uses the model to produce the approximated result for a new parameter.  <a href="#abf735873bfb5ed0c4267ef4e84ac6096">More...</a><br /></td></tr>
+<tr class="separator:abf735873bfb5ed0c4267ef4e84ac6096"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50ee28baa883181adb66634b3bf5da6f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#a50ee28baa883181adb66634b3bf5da6f">cudaInitND</a> (int nModes=-1)</td></tr>
 <tr class="memdesc:a50ee28baa883181adb66634b3bf5da6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">N Dimensional cuda initialization routine. Copies nmodel to cvnmodel.  <a href="#a50ee28baa883181adb66634b3bf5da6f">More...</a><br /></td></tr>
 <tr class="separator:a50ee28baa883181adb66634b3bf5da6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebe09c9eb950838464b40f0b4eb57e73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#aebe09c9eb950838464b40f0b4eb57e73">fitNewCuda</a> (const double &amp;newParam1, cv::Mat &amp;result) const</td></tr>
-<tr class="memdesc:aebe09c9eb950838464b40f0b4eb57e73"><td class="mdescLeft">&#160;</td><td class="mdescRight">3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses openCV::Cuda for matrix-matrix multiplication.  <a href="#aebe09c9eb950838464b40f0b4eb57e73">More...</a><br /></td></tr>
-<tr class="separator:aebe09c9eb950838464b40f0b4eb57e73"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af516c349d7f1358693c23c12e5fd0e3a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#af516c349d7f1358693c23c12e5fd0e3a">fitNewNDCuda</a> (const Vector &amp;newParam1, cv::Mat &amp;result) const</td></tr>
-<tr class="memdesc:af516c349d7f1358693c23c12e5fd0e3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">N Dimensional method that uses the model to produce the approximated result for a new parameter. Uses openCV::Cuda for matrix-matrix multiplication.  <a href="#af516c349d7f1358693c23c12e5fd0e3a">More...</a><br /></td></tr>
-<tr class="separator:af516c349d7f1358693c23c12e5fd0e3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4ec9108f47d2cdae04f968500829b3c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#af4ec9108f47d2cdae04f968500829b3c">fitNewNDCuda</a> (const Vector &amp;newParam1, cv::Mat &amp;result, int nModes) const</td></tr>
+<tr class="memdesc:af4ec9108f47d2cdae04f968500829b3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">N Dimensional method that uses the model to produce the approximated result for a new parameter. Uses openCV::Cuda for matrix-matrix multiplication.  <a href="#af4ec9108f47d2cdae04f968500829b3c">More...</a><br /></td></tr>
+<tr class="separator:af4ec9108f47d2cdae04f968500829b3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a924e820c21de622e0022e92b8949e02f"><td class="memItemLeft" align="right" valign="top">Model&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#a924e820c21de622e0022e92b8949e02f">model</a></td></tr>
-<tr class="separator:a924e820c21de622e0022e92b8949e02f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6f4428333183df8e386aa5f62b5a465"><td class="memItemLeft" align="right" valign="top">cvModel&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#ab6f4428333183df8e386aa5f62b5a465">cvmodel</a></td></tr>
-<tr class="separator:ab6f4428333183df8e386aa5f62b5a465"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adabc757ed567867cd4effda61e706a66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structNModel.html">NModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#adabc757ed567867cd4effda61e706a66">nmodel</a></td></tr>
 <tr class="separator:adabc757ed567867cd4effda61e706a66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f16d6c786a34ea383fcae9691e3040a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structcvNModel.html">cvNModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#a4f16d6c786a34ea383fcae9691e3040a">cvnmodel</a></td></tr>
@@ -135,52 +116,14 @@ Private Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a5690863716889ec49663ff67ff750639"><td class="memItemLeft" align="right" valign="top">const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#a5690863716889ec49663ff67ff750639">c_nmax</a></td></tr>
-<tr class="separator:a5690863716889ec49663ff67ff750639"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade87c2c92505ec38e29d4a3ce42cfa8c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCreateModes.html#ade87c2c92505ec38e29d4a3ce42cfa8c">m_nmax</a></td></tr>
+<tr class="separator:ade87c2c92505ec38e29d4a3ce42cfa8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A model creation class. Creates, stores and uses the model to fit new parameters. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ac0d6c45f5a250706fa2d2e6b3d8c60a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac0d6c45f5a250706fa2d2e6b3d8c60a7">&#9670;&nbsp;</a></span>CreateModes() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">CreateModes::CreateModes </td>
-          <td>(</td>
-          <td class="paramtype">const InputData &amp;&#160;</td>
-          <td class="paramname"><em>inData</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>nmax</em> = <code>500</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>3 Dimensional HOPGD method. Creates model and saves it in <a class="el" href="classCreateModes.html#a924e820c21de622e0022e92b8949e02f">CreateModes.model</a>. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">inData</td><td>input data structure </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nmax</td><td>the maximum number of modes (500 by default) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd>InputData </dd></dl>
-
-</div>
-</div>
 <a id="a073ea1c2100fcedb592615c91ca8a668"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a073ea1c2100fcedb592615c91ca8a668">&#9670;&nbsp;</a></span>CreateModes() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a073ea1c2100fcedb592615c91ca8a668">&#9670;&nbsp;</a></span>CreateModes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -188,7 +131,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">CreateModes::CreateModes </td>
           <td>(</td>
-          <td class="paramtype">const NinputData3 &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="structNinputData3.html">NinputData3</a> &amp;&#160;</td>
           <td class="paramname"><em>input</em></td><td>)</td>
           <td></td>
         </tr>
@@ -202,95 +145,48 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd>NinputData3 </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structNinputData3.html" title="Input Data container for building model via HOPGD. ">NinputData3</a> </dd></dl>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ad89e93277a54080207eb3769129ef8b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad89e93277a54080207eb3769129ef8b5">&#9670;&nbsp;</a></span>fitNew_Loops()</h2>
+<a id="acda042dab900b709e859372d7399f53d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acda042dab900b709e859372d7399f53d">&#9670;&nbsp;</a></span>create()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void CreateModes::fitNew_Loops </td>
+          <td class="memname">void CreateModes::create </td>
           <td>(</td>
-          <td class="paramtype">const double &amp;&#160;</td>
-          <td class="paramname"><em>newParam1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">const <a class="el" href="structNinputData3.html">NinputData3</a> &amp;&#160;</td>
+          <td class="paramname"><em>input</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">Matrix &amp;&#160;</td>
-          <td class="paramname"><em>result</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses triple nested loop, very slow. </p>
+<p>N Dimensional HOPGD method. Recreates model and saves it in <a class="el" href="classCreateModes.html#adabc757ed567867cd4effda61e706a66">CreateModes.nmodel</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">newParam1</td><td>Parameters value. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The resulting approximation. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">input</td><td>input data structure </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structNinputData3.html" title="Input Data container for building model via HOPGD. ">NinputData3</a> </dd></dl>
 
 </div>
 </div>
-<a id="ad402b42e41398d7b043219af582ea6c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad402b42e41398d7b043219af582ea6c9">&#9670;&nbsp;</a></span>fitNew() <span class="overload">[1/2]</span></h2>
+<a id="abf735873bfb5ed0c4267ef4e84ac6096"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf735873bfb5ed0c4267ef4e84ac6096">&#9670;&nbsp;</a></span>fitNewND()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void CreateModes::fitNew </td>
+          <td class="memname">bool CreateModes::fitNewND </td>
           <td>(</td>
-          <td class="paramtype">const double &amp;&#160;</td>
-          <td class="paramname"><em>newParam1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Matrix &amp;&#160;</td>
-          <td class="paramname"><em>result</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses vectors/matrix operations instead of triple loop. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">newParam1</td><td>Parameters value. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The resulting approximation. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a5dfa9adc4f96a9fccb90d272a7cff041"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5dfa9adc4f96a9fccb90d272a7cff041">&#9670;&nbsp;</a></span>fitNew() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CreateModes::fitNew </td>
-          <td>(</td>
-          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramtype">const Vector &amp;&#160;</td>
           <td class="paramname"><em>newParam1</em>, </td>
         </tr>
         <tr>
@@ -313,75 +209,11 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses vectors/matrix operations instead of triple loop. Uses limited number of modes. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">newParam1</td><td>Parameters value. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The resulting approximation. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">nModes</td><td>Specifies the maximum number of modes used in approximation. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aeaca95e656d5be4473acc1ddf446bb59"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeaca95e656d5be4473acc1ddf446bb59">&#9670;&nbsp;</a></span>fitNewND()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CreateModes::fitNewND </td>
-          <td>(</td>
-          <td class="paramtype">const Vector &amp;&#160;</td>
-          <td class="paramname"><em>newParam1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Matrix &amp;&#160;</td>
-          <td class="paramname"><em>result</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
 <p>N Dimensional method that uses the model to produce the approximated result for a new parameter. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">newParam1</td><td>The vector of the parameters values. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The resulting approximation. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ac2d60d8b0025ddd86d2079a555344747"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2d60d8b0025ddd86d2079a555344747">&#9670;&nbsp;</a></span>cudaInit()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CreateModes::cudaInit </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>nModes</em> = <code>-1</code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>3 Dimensional cuda initialization routine. Copies model to cvmodel. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">nModes</td><td>Specifies the maximum number of modes used in approximation. Default =-1: use the same number of modes as in model. </td></tr>
   </table>
   </dd>
 </dl>
@@ -414,51 +246,14 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aebe09c9eb950838464b40f0b4eb57e73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebe09c9eb950838464b40f0b4eb57e73">&#9670;&nbsp;</a></span>fitNewCuda()</h2>
+<a id="af4ec9108f47d2cdae04f968500829b3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4ec9108f47d2cdae04f968500829b3c">&#9670;&nbsp;</a></span>fitNewNDCuda()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void CreateModes::fitNewCuda </td>
-          <td>(</td>
-          <td class="paramtype">const double &amp;&#160;</td>
-          <td class="paramname"><em>newParam1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">cv::Mat &amp;&#160;</td>
-          <td class="paramname"><em>result</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>3 Dimensional method that uses the model to produce the approximated result for a new parameter. Uses openCV::Cuda for matrix-matrix multiplication. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">newParam1</td><td>Parameters value. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The resulting approximation stored in opencv::Mat class. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="af516c349d7f1358693c23c12e5fd0e3a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af516c349d7f1358693c23c12e5fd0e3a">&#9670;&nbsp;</a></span>fitNewNDCuda()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CreateModes::fitNewNDCuda </td>
+          <td class="memname">bool CreateModes::fitNewNDCuda </td>
           <td>(</td>
           <td class="paramtype">const Vector &amp;&#160;</td>
           <td class="paramname"><em>newParam1</em>, </td>
@@ -467,7 +262,13 @@ Private Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">cv::Mat &amp;&#160;</td>
-          <td class="paramname"><em>result</em>&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nModes</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -586,36 +387,6 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a924e820c21de622e0022e92b8949e02f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a924e820c21de622e0022e92b8949e02f">&#9670;&nbsp;</a></span>model</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Model CreateModes::model</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The 3D model structure. </p>
-
-</div>
-</div>
-<a id="ab6f4428333183df8e386aa5f62b5a465"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab6f4428333183df8e386aa5f62b5a465">&#9670;&nbsp;</a></span>cvmodel</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">cvModel CreateModes::cvmodel</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The 3D model structure that uses opencv::Mat. </p>
-
-</div>
-</div>
 <a id="adabc757ed567867cd4effda61e706a66"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adabc757ed567867cd4effda61e706a66">&#9670;&nbsp;</a></span>nmodel</h2>
 
@@ -646,8 +417,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5690863716889ec49663ff67ff750639"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5690863716889ec49663ff67ff750639">&#9670;&nbsp;</a></span>c_nmax</h2>
+<a id="ade87c2c92505ec38e29d4a3ce42cfa8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade87c2c92505ec38e29d4a3ce42cfa8c">&#9670;&nbsp;</a></span>m_nmax</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -656,7 +427,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const int CreateModes::c_nmax</td>
+          <td class="memname">int CreateModes::m_nmax</td>
         </tr>
       </table>
   </td>

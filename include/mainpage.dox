@@ -11,9 +11,48 @@
  * 	<a href="https://bitbucket.org/blaze-lib/blaze/src/master/">Blaze</a>
  *	<a href="https://www.sharcnet.ca/Software/Abaqus610/Documentation/docs/v6.10/books/ker/default.htm?startat=pt02ch57.html">Abaqus OdbApi</a>
  * </pre>
+ * \section build_sec How to Build (Linux):
+ * <pre>
+ * 1) Create 'Release' folder:
+ *		mkdir Release
+ *		mkdir Release/src
+ *		cd    Release
+ * 2) Assign paths (possible some other that I forgot):
+ *		----------------------------------------------------------------------------
+ * 		|name 	       | description         | "example"                           |
+ *		|--------------------------------------------------------------------------|
+ *		|                             Include Paths                                |
+ *		|--------------------------------------------------------------------------|
+ *		|projectDir    | Project folder path | "/home/ikriuchevs/workspace/melted/"|
+ *		|cvInclDir     | Opencv Include path | "/usr/local/include/opencv4/"       |
+ *		|boostInclDir  | Boost  Include path | "/usr/include/boost/"               |
+ *		|abqInclDir    | Abaqus Include path | "/opt/abaqus/6.14-5/code/include/"  |
+ *		|--------------------------------------------------------------------------|
+*		|                             Libs    Paths                                |
+ *		|--------------------------------------------------------------------------|
+ *		|abqLiblDir2   | Abaqus Libs    path | "/opt/abaqus/6.14-5/code/bin/"	   | 
+ *		----------------------------------------------------------------------------
+ *
+ * Append to Envirment variables:
+ * 	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$abqLiblDir2
+ * Build for all *cpp in src/:
+ * for f in ../src/*;do ff=$(basename $f .cpp);g++ -DBLAZE_USE_CPP_THREADS -I"$projectDir/include" -I/usr/local/include -I"$cvInclDir" -I$boostInclDir -I$abqInclDir -O3 -w -c -fmessage-length=0 -std=c++17 -MMD -MP -MF"src/$ff.d" -MT"src/$ff.d" -o "src/$ff.o" "../src/$ff.cpp";done
+ *
+ * Linker: 
+ * g++ -L$abqLiblDir1 -L$abqLiblDir2 -fopenmp -o "melted"  ./src/CreateModes.o ./src/NDMatrix.o ./src/fileManager.o ./src/melted.o ./src/core.o   -lopencv_core -lboost_program_options -lABQSMAOdbApi -lABQSMAOdbCore -lABQSMAOdbCoreGeom -lABQSMAAbuGeom -lABQSMAOdbAttrEO -lABQSMABasShared -lABQSMAAspSupport -lABQSMABasCoreUtils -lABQSMAAbuBasicUtils -lABQSMARomDiagEx -lABQSMAAspSupport -lABQSMAFeoModules -lABQSMAShpCore -lABQSMARfmInterface -lABQDMP_Core -lABQSMAAspDiagExtractor -lABQSMAAspSchemaSupport -lABQSMAElkCore -lABQSMAEliLicense -lABQSMAMsgCommModules -lABQSMABasPrfTrkLib -lABQSMAAspCommunications -lABQSMAMsgModules -lABQSMABasMem -lABQSMAPyqOdbApiModule -lABQSMAOdb2SimConv -lABQSMAIofCore -lABQSMAOdbDdbOdb -lopencv_cudaarithm -lboost_filesystem -lgomp -lpthread -lboost_system
+ </pre>
  * \section usage_sec How to use.
  * \section func_sec Functionality. 
+ * <pre>
+ * Main c++ program: 
+ * 1) Read .odb files
+ * 2) Create redused model(RM) via HOPGD (N-dimensions, N>2)
+ * 3) Save/Load RM to/from txt files
+ * 4) Find approximate solution for new parameter using RM
  *
- *
+ * Supporting bash scripts ($projectDir/bash):
+ * 1) prepare_folders.sh : Using abaqus input template(*.inp) and parameters list(params.in) creates multiple folder with all combinations of the parameters.
+ * 2) run.sh : Runs all abaqus jobs.
+ * </pre>
  * etc...
  */

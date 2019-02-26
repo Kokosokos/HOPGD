@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hopgd',['HOPGD',['../classCreateModes.html#a8c1e63cf08215171021e550aba661eef',1,'CreateModes']]]
+  ['error',['error',['../structNinputData3.html#a513d655393fc9a9133cc19e39b3b01df',1,'NinputData3']]]
 ];

@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
@@ -59,37 +65,41 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structNinputData3-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">NinputData3 Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Input Data container for building model via HOPGD.  
+ <a href="structNinputData3.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="NDMatrix_8h_source.html">NDMatrix.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:abc1d6ff5f87b73dcf1d94c6dc4faa543"><td class="memItemLeft" align="right" valign="top"><a id="abc1d6ff5f87b73dcf1d94c6dc4faa543"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>NinputData3</b> (<a class="el" href="structinputData.html">inputData</a> data)</td></tr>
-<tr class="separator:abc1d6ff5f87b73dcf1d94c6dc4faa543"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a513d655393fc9a9133cc19e39b3b01df"><td class="memItemLeft" align="right" valign="top"><a id="a513d655393fc9a9133cc19e39b3b01df"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>error</b></td></tr>
+float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structNinputData3.html#a513d655393fc9a9133cc19e39b3b01df">error</a></td></tr>
+<tr class="memdesc:a513d655393fc9a9133cc19e39b3b01df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Required precision of the model. <br /></td></tr>
 <tr class="separator:a513d655393fc9a9133cc19e39b3b01df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad48f8b6a1d09784f1938557ee531b0ad"><td class="memItemLeft" align="right" valign="top"><a id="ad48f8b6a1d09784f1938557ee531b0ad"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>nModesMax</b></td></tr>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structNinputData3.html#ad48f8b6a1d09784f1938557ee531b0ad">nModesMax</a></td></tr>
+<tr class="memdesc:ad48f8b6a1d09784f1938557ee531b0ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum number of modes in the model. <br /></td></tr>
 <tr class="separator:ad48f8b6a1d09784f1938557ee531b0ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a838bada5daf1b81115df23adcbc51461"><td class="memItemLeft" align="right" valign="top"><a id="a838bada5daf1b81115df23adcbc51461"></a>
-std::vector&lt; Vector &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>params</b></td></tr>
+std::vector&lt; Vector &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structNinputData3.html#a838bada5daf1b81115df23adcbc51461">params</a></td></tr>
+<tr class="memdesc:a838bada5daf1b81115df23adcbc51461"><td class="mdescLeft">&#160;</td><td class="mdescRight">The values of the parameters for th input snapshots. <br /></td></tr>
 <tr class="separator:a838bada5daf1b81115df23adcbc51461"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb2fe899a5150e3ea01c3f750bc305d9"><td class="memItemLeft" align="right" valign="top"><a id="afb2fe899a5150e3ea01c3f750bc305d9"></a>
-<a class="el" href="classmyMatrix3.html">myMatrix3</a>&#160;</td><td class="memItemRight" valign="bottom"><b>A</b></td></tr>
-<tr class="separator:afb2fe899a5150e3ea01c3f750bc305d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bdaec84eb792dfce4823c9c7a6ca1fc"><td class="memItemLeft" align="right" valign="top"><a id="a3bdaec84eb792dfce4823c9c7a6ca1fc"></a>
+<a class="el" href="classNDMatrix.html">NDMatrix</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structNinputData3.html#a3bdaec84eb792dfce4823c9c7a6ca1fc">A</a></td></tr>
+<tr class="memdesc:a3bdaec84eb792dfce4823c9c7a6ca1fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">N-dimensional matrix to store all input snapshots. <br /></td></tr>
+<tr class="separator:a3bdaec84eb792dfce4823c9c7a6ca1fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this struct was generated from the following file:<ul>
-<li>include/<a class="el" href="mymatrix3_8h_source.html">mymatrix3.h</a></li>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Input Data container for building model via HOPGD. </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>include/<a class="el" href="NDMatrix_8h_source.html">NDMatrix.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

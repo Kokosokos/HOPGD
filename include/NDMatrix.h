@@ -7,7 +7,7 @@
 
 #ifndef MATRIXVECTOR3_H_
 #define MATRIXVECTOR3_H_
-#include "mymatrix.h"
+#include "core.h"
 
 
 
@@ -157,13 +157,28 @@ public:
 	intVector	m_current_index;
 };
 
+/**
+ * @brief Input Data container for building model via HOPGD.
+ */
 struct NinputData3
 {
 
+	/**
+	 * @brief Required precision of the model.
+	 */
 	float	error;
+	/**
+	 * @brief The maximum number of modes in the model.
+	 */
 	int nModesMax;
+	/**
+	 * @brief The values of the parameters for th input snapshots.
+	 */
 	std::vector<Vector> params;
 
+	/**
+	 * @brief N-dimensional matrix to store all input snapshots.
+	 */
 	NDMatrix A;
 	NinputData3(){};
 	NinputData3(InputData data):A(data),error(data.error){params.push_back(data.param1);};

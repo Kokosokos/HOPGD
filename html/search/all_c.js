@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['_7efilemanager',['~FileManager',['../classFileManager.html#abaed33b5b0c13b8a597db9335a1aacfa',1,'FileManager']]]
+  ['savemodel',['saveModel',['../classFileManager.html#a85ef8feb8cfd00a030baeee9f3348ca9',1,'FileManager']]],
+  ['setsize',['setSize',['../classNDMatrix.html#abdae365d88af34373cd95876c7b3f85e',1,'NDMatrix']]],
+  ['sizes',['sizes',['../classNDMatrix.html#a597cc4473dbc12ae0ed012369584188d',1,'NDMatrix']]]
 ];

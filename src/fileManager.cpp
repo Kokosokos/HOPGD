@@ -1,56 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h> /* strtof */
 #include "fileManager.h"
-//#include "NDMatrix.h"
 #include <odb_API.h>
 
-#include <boost/filesystem.hpp>
-using namespace boost::filesystem;
 #include <fstream>
 #include <iostream>
 #include <sstream>      // std::istringstream
 //---------------------------------------------------------------------------------------------------
-
-typedef blaze::DynamicVector<string,blaze::rowMajor> SVector;
 const int c_tmax=100;
 const string c_field_string="NT11";
 const string c_step_name="Step-1";
 //---------------------------------------------------------------------------------------------------
-class sort_indices
-{
-private:
-	Vector mparr;
-public:
-	sort_indices(Vector parr) : mparr(parr) {}
-	bool operator()(int i, int j) const { return mparr[i]<mparr[j]; }
-};
-
-void vectorSort2(Vector& p,SVector& s)
-{
-	int *indices=new int[p.size()];
-	for (uint i =0;i<p.size();++i)
-		indices[i]=i;
-	std::sort(indices,indices+p.size(),sort_indices(p));
-	Vector p1=p;
-	SVector s1=s;;
-	for (uint i =0;i<p.size();++i)
-	{
-		p[i]=p1[indices[i]];
-		s[i]=s1[indices[i]];
-	}
-	delete[] indices;
-
-}
-//---------------------------------------------------------------------------------------------------
-
-double my_stod (std::string const& s) {
-    std::istringstream iss (s);
-    iss.imbue (std::locale("C"));
-    double d;
-    iss >> d;
-    // insert error checking.
-    return d;
-}
 
 //---------------------------------------------------------------------------------------------------
 FileManager::FileManager(){	odb_initializeAPI();}
@@ -136,7 +96,7 @@ bool FileManager::loadModel(string dirPath, NModel& model)
 	std::ifstream inFile;
 	inFile.open((dirPath+"model.dat").c_str(), std::ios_base::in);
 	if (!inFile) {
-		std::cerr << "Unable to open file "+(dirPath+"model.dat");
+		std::cerr << "Unable to open model file "+(dirPath+"model.dat");
 		return false;   // call system to stop
 	}
 	inFile>>model.nbrModes;
@@ -186,12 +146,9 @@ void FileManager::readParams(string foldername, int& dim, intVector& sizes,std::
 	    	s++;
 	    	p1.resize(s,true);
 	    	p1[s-1]=temp;
-//	    	std::cout << temp<<" ";
-	    } // error
+	    }
 
 	    params.push_back(p1);
-//	    std::cout <<"\n";
-	    // process pair (a,b)
 	}
 	sizes=intVector(dim);
 	for(int d=0;d<dim;++d)
@@ -205,7 +162,6 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata)
 {
 	int dim=0;						//dimensionality of the system
 	intVector paramSizes;			//the sizes of parameters dimensions
-//	std::vector<Vector> parameters;
 	readParams(foldername, dim, paramSizes, Ndata.params);
 
 	dim=dim+2;
@@ -216,9 +172,6 @@ void FileManager::readFolder(string foldername, NinputData3& Ndata)
 
 void FileManager::readFolder(string foldername, NinputData3& Ndata, int dim, intVector param_sizes)
 {
-	//SORT parameters array++++++++!!!
-//	vectorSort2(Ndata.params[0],sparam1);
-	//+++++++++++++++++++++++++++
 	int spaceDegreOfFreedom=0;
 	int timeDegreOfFreedom=0;
 	string new_filename = foldername + "/1/"+c_odb_filename;
@@ -258,7 +211,6 @@ void FileManager::readODB2(string filename, Matrix& m)
 {
 	odb_Odb& myOdb = openOdb(filename.c_str(), true);
 
-//	odb_Step& step = myOdb.steps()[c_step_name];
 	odb_String stepName(c_step_name.c_str(),c_step_name.size());
 	odb_StepRepository& steps = myOdb.steps();
 	odb_Step& step = steps[stepName];
@@ -274,10 +226,8 @@ void FileManager::readODB2(string filename, Matrix& m)
 			const odb_FieldValue val = temp[spaceID];
 			const float* const NT11 = val.data(numComp);
 			int comp=0;
-//			for (int comp=0;comp<numComp;comp++)
 			m(spaceID,timeID)= NT11[comp];
 		}
-//	cout<<timeID<<endl;
 
 	}
 	myOdb.close();
@@ -285,21 +235,18 @@ void FileManager::readODB2(string filename, Matrix& m)
 //---------------------------------------------------------------------------------------------------
 void FileManager::readODB_SpacexTime(string filename, int& spaceDegreOfFreedom, int& timeDegreOfFreedom)
 {
-//	odb_initializeAPI();
-//
+
 	odb_Odb& myOdb = openOdb(filename.c_str(), true);
 	odb_StepRepository& steps = myOdb.steps();
 	odb_String stepName(c_step_name.c_str(),c_step_name.size());
 	odb_Step& step = steps[stepName];
 
-//	odb_Step& step = myOdb.steps()["Step-1"];
 	odb_SequenceFrame& allFramesInStep = step.frames();
 	int numFrames = allFramesInStep.size();
-	numFrames=c_tmax;
+//	numFrames=c_tmax;
 	timeDegreOfFreedom=numFrames;
 	int numValues = allFramesInStep[numFrames-1].fieldOutputs()[c_field_string.c_str()].values().size();
 	spaceDegreOfFreedom=numValues;
 	myOdb.close();
-//	odb_finalizeAPI();
 }
 

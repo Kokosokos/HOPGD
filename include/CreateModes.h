@@ -8,9 +8,7 @@
 #ifndef CREATEMODES_H_
 #define CREATEMODES_H_
 
-#include "fileManager.h"
 #include "NDMatrix.h"
-//typedef blaze::DynamicVector<Matrix,blaze::rowMajor> MVector;
 
 /**
  * @brief  A model creation class. Creates, stores and uses the model to fit new parameters.

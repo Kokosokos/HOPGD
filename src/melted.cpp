@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include <fstream>
-#include "mymatrix.h"
 #include "fileManager.h"
 #include <boost/filesystem.hpp>
 #include "CreateModes.h"
@@ -28,23 +27,32 @@ struct stat info;
 
 int main(int argc, char * argv[])
 {
-	// process arguments
-	// Declare the supported options.
-	po::options_description desc("Allowed options");
+
+	int nmbrModes;					//maximum number of modes used
+	float error   = 0.001;			//Model precision
+	int nthreads;					//number of threads for openmp blaze-lib parallelization
+	FileManager file_manager;		//Input files reader class
+	NinputData3 nData;				//input data container
+	string snapshotsFolder = "./";	//snapshots folder
+
+	CreateModes modesCreator3;		//HOPGD
+	string modelFolder = "model/";	//folder to store the model files
+	string validationFolder;		//folder to read .odb files for validation
+
+
+
+	// Process arguments
+	//-----------------------------------------------------------------
 	bool createModelFlag = false;
 	bool validationFlag  = false;
-	int nmbrModes=20;				//maximum number of modes used
-	int nthreads = 8;				//number of threads for openmp blaze-lib parallelization
-
-	string validationFolder;
-
+	po::options_description desc("Allowed options");
 	desc.add_options()
 		    						("help", "produce help message")
 		    						("create_model,c", po::bool_switch(&createModelFlag)->default_value(false), "creates model and stores it in \'model\' folder")
 		    						("validation,v",po::bool_switch(&validationFlag)->default_value(false), "runs the model validation routine. Validation folder name must be provided with --vfolder")
 		    						("vfolder",po::value<string>(&validationFolder), "The folder name of validation snapshots.")
-		    						("nmax",po::value<int>(&nmbrModes)->default_value(20), "The maximum number of modes in the model (default = 20).")
-		    						("nthreads",po::value<int>(&nthreads)->default_value(8), "The number of cores used by openmp (default = 8).")
+		    						("nmax",po::value<int>(&nmbrModes)->default_value(20), "The maximum number of modes in the model.")
+		    						("nthreads",po::value<int>(&nthreads)->default_value(8), "The number of cores used by openmp.")
 		    						;
 
 	po::variables_map vm;
@@ -62,32 +70,25 @@ int main(int argc, char * argv[])
 		return 1;
 	}
 
-	blaze::setNumThreads( nthreads );
-	FileManager file_manager;		//input files reader class
-	CreateModes modesCreator3;//(nData);
-	string modelFolder =			/*folder to store the model files*/
-			"model/";
-	//			"/home/ikriuchevs/workspace/melted/tests/Ndim//Jobs_bash_test/model/";
+	//-----------------------------------------------------------------
+
+	blaze::setNumThreads( nthreads ); //OpenMP paralellization of blaze libriary
+
 	if(createModelFlag)
 	{
-		NinputData3 nData;				//input data container
-
-		string snapshotsFolder = 		/*snapshots folder*/
-				"./";
-		//			"/home/ikriuchevs/workspace/melted/tests/Ndim//Jobs_bash_test/";
-
+		//Creating the model
+		//-------------------------------------------------------------
+		nData.error 	= error;
+		nData.nModesMax = nmbrModes;
 
 		std::cout<<"Reading Snapshots: \n";
 		double start = omp_get_wtime();
 		file_manager.readFolder(snapshotsFolder, nData );
 		std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
 
-		nData.error 	= 0.001;		//Model precision
-		nData.nModesMax = nmbrModes;			//Maximum number of modes
 
 		std::cout<<"Creating model: ";
 		start = omp_get_wtime();
-
 		modesCreator3.create(nData);
 		std::cout<< omp_get_wtime() - start <<" sec"<<"\n";
 
@@ -95,11 +96,17 @@ int main(int argc, char * argv[])
 		start = omp_get_wtime();
 		file_manager.saveModel(modelFolder, modesCreator3.nmodel);
 		std::cout<< "\nDone\n"<<omp_get_wtime() - start <<" sec"<<"\n";
-		//
+		//-------------------------------------------------------------
 	}
 	else
 	{
-		file_manager.loadModel(modelFolder, modesCreator3.nmodel);
+		//Loading the model that was previously created
+		//-------------------------------------------------------------
+		if (!file_manager.loadModel(modelFolder, modesCreator3.nmodel))
+		{
+			return 1;
+		}
+		//-------------------------------------------------------------
 	}
 
 	if(nmbrModes > modesCreator3.nmodel.nbrModes)
@@ -109,13 +116,12 @@ int main(int argc, char * argv[])
 	}
 	if (validationFlag)
 	{
-		int dim=modesCreator3.nmodel.dim;
-//		string validationFolder="/home/ikriuchevs/workspace/melted/tests/Ndim/Validation/";
-		Matrix M(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows());
-		Matrix Mfit(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows());
-
 		double start = omp_get_wtime();
 		double fin;
+
+		int dim = modesCreator3.nmodel.dim;
+		Matrix M(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows());
+		Matrix Mfit(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows());
 
 		FILE * outFile;
 		string outFileName=validationFolder+"/nmax"+std::to_string(nmbrModes)+".omp"+std::to_string(nthreads)+".dat";
@@ -131,16 +137,20 @@ int main(int argc, char * argv[])
 		res.create(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows(),opencvMatrixType);
 
 		int i=1;
-//		for(int i=1;i<=4;++i)
+		//Loop over folders, assuming that folder names are just integers from 1
 		while(stat((validationFolder+"/"+std::to_string(i)).c_str(), &info) == 0)
 		{
-			string filename=validationFolder+"/"+std::to_string(i)+"/"+c_odb_filename;//<--odb_filename defined in
+			string filename = validationFolder+"/"+std::to_string(i)+"/"+c_odb_filename;//<--odb_filename defined in
 			cout<<filename<<endl;
+
+			//Reading validation file
 			file_manager.readODB2(filename, M);
 
-			string paramname=validationFolder+"/"+std::to_string(i)+"/params.dat";
+			//Reading parameters values
+			//---------------------------
+			string paramFileName = validationFolder+"/"+std::to_string(i)+"/"+c_parameters_filename;
 			std::ifstream inFile;
-			inFile.open(paramname, std::ios_base::in);
+			inFile.open(paramFileName, std::ios_base::in);
 			double temp=0;
 			Vector param(dim-2,0);
 			for(int d=0;d<dim-2;++d)
@@ -151,10 +161,13 @@ int main(int argc, char * argv[])
 					param[d]=temp;
 				}
 			}
-
 			inFile.close();
-			start = omp_get_wtime();
+			//---------------------------
 			cout<<"params: "<<blaze::trans(param);
+
+			//Using the model to obtain the approximate solution for current parameters
+			//---------------------------
+			start = omp_get_wtime();
 			if(modesCreator3.fitNewND(param,Mfit, nmbrModes))
 			{
 				fin=omp_get_wtime()-start;
@@ -178,6 +191,8 @@ int main(int argc, char * argv[])
 			{
 				fprintf (outFile, "%d Enrichment is needed\n\n",i );
 			}
+			//---------------------------
+
 			i++;
 		}
 		fclose (outFile);
