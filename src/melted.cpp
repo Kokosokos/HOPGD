@@ -127,15 +127,18 @@ int main(int argc, char * argv[])
 		string outFileName=validationFolder+"/nmax"+std::to_string(nmbrModes)+".omp"+std::to_string(nthreads)+".dat";
 		outFile = fopen(outFileName.c_str(), "w");
 		fprintf (outFile, "#nbr of modes = %d\n",modesCreator3.nmodel.nbrModes);
-		fprintf (outFile, "#Folder Error Time CudaError CudaTime\n");
+
 
 		blaze::setNumThreads( nthreads );
-
+#ifdef WITHOPENCV
+		fprintf (outFile, "#Folder Error Time CudaError CudaTime\n");
 		//CUDA
 		modesCreator3.cudaInitND(nmbrModes);
 		cv::Mat res;
 		res.create(modesCreator3.nmodel.F[0].rows(),modesCreator3.nmodel.F[1].rows(),opencvMatrixType);
-
+#else
+		fprintf (outFile, "#Folder Error Time\n");
+#endif
 		int i=1;
 		//Loop over folders, assuming that folder names are just integers from 1
 		while(stat((validationFolder+"/"+std::to_string(i)).c_str(), &info) == 0)
@@ -176,6 +179,7 @@ int main(int argc, char * argv[])
 
 				cout<<"OMP: error = "<<err<<"%; time = "<<fin<<" sec;";
 				fprintf (outFile, "%d %f %lf ", i, err, fin );
+#ifdef WITHOPENCV
 
 				start = omp_get_wtime();
 				modesCreator3.fitNewNDCuda(param,res,nmbrModes);
@@ -186,6 +190,10 @@ int main(int argc, char * argv[])
 				err=fabs(100.0*(1.0-blaze::norm(M)/blaze::norm(Mfit)));
 				std::cout<<" CUDA: error = "<<err<<"%; time = "<<fin  << " sec"<<endl<<endl;
 				fprintf (outFile, "%f %lf\n", err, fin );
+#else
+				std::cout<<"\n";
+				fprintf (outFile, "\n");
+#endif
 			}
 			else
 			{
