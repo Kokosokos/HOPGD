@@ -1,4 +1,5 @@
 Melted is the project that implements N-dimensional High Order Proper Generalized Decomposition (HOPGD).
+(You can also check out doxygen documentation - just run html/index.html)
 
 Requirements
   Libriaries:
