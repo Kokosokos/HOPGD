@@ -1,0 +1,46 @@
+Melted is the project that implements N-dimensional High Order Proper Generalized Decomposition (HOPGD).
+
+Requirements
+  Libriaries:
+    OpenCV
+    Blaze
+    Abaqus OdbApi
+  
+How to Build:
+  1) Create 'Release' folder:
+        mkdir Release
+        mkdir Release/src
+        cd    Release
+  2) Assign paths (possible some other that I forgot):
+        ----------------------------------------------------------------------------
+        |name          | description         | "example"                           |
+        |--------------------------------------------------------------------------|
+        |                             Include Paths                                |
+        |--------------------------------------------------------------------------|
+        |projectDir    | Project folder path | "/home/ikriuchevs/workspace/melted/"|
+        |cvInclDir     | Opencv Include path | "/usr/local/include/opencv4/"       |
+        |boostInclDir  | Boost  Include path | "/usr/include/boost/"               |
+        |abqInclDir    | Abaqus Include path | "/opt/abaqus/6.14-5/code/include/"  |
+        |--------------------------------------------------------------------------|
+        |                             Libs    Paths                                |
+        |--------------------------------------------------------------------------|
+        |projectDir    | Project folder path | "/home/ikriuchevs/workspace/melted/"|
+        |cvInclDir     | Opencv Include path | "/usr/local/include/opencv4/"       |
+        |abqLiblDir1   | Abaqus Libs    path | "/opt/abaqus/6.14-5/code/lib/"      |
+        |abqLiblDir2   | Abaqus Libs    path | "/opt/abaqus/6.14-5/code/bin/"      | 
+  Build for all *cpp in src/:
+  for f in ../src/*;do ff=$(basename $f .cpp);g++ -DBLAZE_USE_CPP_THREADS -I"$projectDir/include" -I/usr/local/include -I"$cvInclDir" -I$boostInclDir -I$abqInclDir -O3 -w -c -fmessage-length=0 -std=c++17 -MMD -MP -MF"src/$ff.d" -MT"src/$ff.d" -o "src/$ff.o" "../src/$ff.cpp";done
+  Linker: 
+  g++ -L/usr/lib/ -L$abqLiblDir1 -L$abqLiblDir2 -L/usr/local/lib/ -L/usr/local/cuda/lib64 -L/usr/lib/x86_64-linux-gnu/ -fopenmp -o "melted"  ./src/CreateModes.o ./src/NDMatrix.o ./src/fileManager.o ./src/melted.o ./src/mymatrix.o   -lopencv_core -lboost_program_options -lABQSMAOdbApi -lABQSMAOdbCore -lABQSMAOdbCoreGeom -lABQSMAAbuGeom -lABQSMAOdbAttrEO -lABQSMABasShared -lABQSMAAspSupport -lABQSMABasCoreUtils -lABQSMAAbuBasicUtils -lABQSMARomDiagEx -lABQSMAAspSupport -lABQSMAFeoModules -lABQSMAShpCore -lABQSMARfmInterface -lABQDMP_Core -lABQSMAAspDiagExtractor -lABQSMAAspSchemaSupport -lABQSMAElkCore -lABQSMAEliLicense -lABQSMAMsgCommModules -lABQSMABasPrfTrkLib -lABQSMAAspCommunications -lABQSMAMsgModules -lABQSMABasMem -lABQSMAPyqOdbApiModule -lABQSMAOdb2SimConv -lABQSMAIofCore -lABQSMAOdbDdbOdb -lopencv_cudaarithm -lopencv_imgproc -lopencv_highgui -lopencv_ml -lopencv_video -lopencv_features2d -lopencv_calib3d -lopencv_objdetect -lboost_filesystem -lgomp -lpthread -lboost_system
+How to use.
+Functionality.
+  Main c++ program: 
+  1) Read .odb files
+  2) Create redused model(RM) via HOPGD (N-dimensions, N>2)
+  3) Save/Load RM to/from txt files
+  4) Find approximate solution for new parameter using RM
+  Supporting bash scripts ($projectDir/bash):
+  1) prepare_folders.sh : Using abaqus input template(*.inp) and parameters list(params.in) creates multiple folder with all combinations of the parameters.
+  2) run.sh : Runs all abaqus jobs.
+  
+etc...
